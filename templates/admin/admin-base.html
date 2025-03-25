@@ -29,7 +29,7 @@
     <!-- Custom CSS -->
     {% block extra_css %}
     <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-{% endblock %}
+    {% endblock %}
 
     <title>Ecommerce Website</title>
 
@@ -41,30 +41,52 @@
         --accent-color: #36b9cc;
         --text-light: #f8f9fc;
         --sidebar-width: 250px;
+        --sidebar-collapsed-width: 70px;
         --transition-speed: 0.3s;
         --sidebar-bg: linear-gradient(180deg, #4e73df 0%, #224abe 100%);
       }
 
       body {
         font-family: 'Nunito', 'Segoe UI', Roboto, sans-serif;
+        transition: margin-left var(--transition-speed) ease-in-out;
       }
 
       .sidebar {
         position: fixed;
         top: 0;
-        left: -var(--sidebar-width);
+        left: 0;
         width: var(--sidebar-width);
-        height: 100%;
+        height: 100vh;
         background: var(--sidebar-bg);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         padding-top: 0;
-        transition: left var(--transition-speed) ease-in-out;
+        transition: width var(--transition-speed) ease-in-out;
         z-index: 1000;
         overflow-y: auto;
+        overflow-x: hidden;
       }
 
-      .sidebar.open {
-        left: 0;
+      .sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+      }
+
+      .sidebar.collapsed .sidebar-header h3,
+      .sidebar.collapsed .nav-link span {
+        display: none;
+      }
+
+      .sidebar.collapsed .nav-link {
+        justify-content: center;
+        padding: 12px 0;
+      }
+
+      .sidebar.collapsed .nav-link i {
+        margin-right: 0;
+        font-size: 1.3rem;
+      }
+
+      .sidebar.collapsed .menu-divider {
+        margin: 10px 5px;
       }
 
       .sidebar-header {
@@ -72,6 +94,8 @@
         background-color: rgba(0, 0, 0, 0.1);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
       }
 
       .sidebar-header h3 {
@@ -80,6 +104,7 @@
         font-weight: 700;
         color: var(--text-light);
         letter-spacing: 0.5px;
+        transition: opacity var(--transition-speed);
       }
 
       .sidebar-menu {
@@ -97,6 +122,7 @@
         transition: all 0.2s ease;
         border-left: 4px solid transparent;
         margin: 4px 0;
+        white-space: nowrap;
       }
 
       .sidebar a i {
@@ -104,6 +130,7 @@
         font-size: 1.1rem;
         min-width: 25px;
         text-align: center;
+        transition: margin var(--transition-speed);
       }
 
       .sidebar a:hover {
@@ -123,6 +150,7 @@
         height: 1px;
         background-color: rgba(255, 255, 255, 0.1);
         margin: 10px 15px;
+        transition: margin var(--transition-speed);
       }
 
       /* Sidebar Toggle Button */
@@ -134,12 +162,20 @@
         color: white;
         border: none;
         border-radius: 4px;
-        padding: 10px 15px;
+        padding: 10px 12px;
         cursor: pointer;
         z-index: 1001;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         transition: all 0.2s ease;
-      }
+        display: none; /* Hidden by default */
+    }
+
+    /* Show toggle button only on mobile */
+    @media (max-width: 768px) {
+        .sidebar-toggle {
+            display: block; /* Show on mobile */
+        }
+    }
 
       .sidebar-toggle:hover {
         background-color: var(--secondary-color);
@@ -147,31 +183,110 @@
 
       /* Main Content */
       .content {
-        margin-left: 0;
+        margin-left: var(--sidebar-width);
         padding: 20px;
         transition: margin-left var(--transition-speed) ease-in-out;
+        min-height: 100vh;
       }
 
-      .sidebar.open + .content {
-        margin-left: var(--sidebar-width);
+      .sidebar.collapsed + .content {
+        margin-left: var(--sidebar-collapsed-width);
+      }
+
+      /* Overlay for mobile */
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
       }
 
       /* Responsive */
-      @media (min-width: 768px) {
+      @media (max-width: 992px) {
         .sidebar {
+          width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar .sidebar-header h3,
+        .sidebar .nav-link span {
+          display: none;
+        }
+
+        .sidebar .nav-link {
+          justify-content: center;
+          padding: 12px 0;
+        }
+
+        .sidebar .nav-link i {
+          margin-right: 0;
+          font-size: 1.3rem;
+        }
+
+        .sidebar .menu-divider {
+          margin: 10px 5px;
+        }
+
+        .content {
+          margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-toggle {
+          display: block;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -100%;
+          width: var(--sidebar-width);
+        }
+        
+        .sidebar .sidebar-header h3,
+        .sidebar .nav-link span {
+          display: block;
+        }
+
+        .sidebar .nav-link {
+          justify-content: flex-start;
+          padding: 12px 20px;
+        }
+
+        .sidebar .nav-link i {
+          margin-right: 10px;
+          font-size: 1.1rem;
+        }
+
+        .sidebar .menu-divider {
+          margin: 10px 15px;
+        }
+
+        .sidebar.open {
           left: 0;
         }
+
         .content {
-          margin-left: var(--sidebar-width);
+          margin-left: 0;
         }
-        .sidebar-toggle {
-          display: none;
+
+        .sidebar.open + .content {
+          margin-left: 0;
+        }
+
+        .sidebar.open ~ .sidebar-overlay {
+          display: block;
         }
       }
     </style>
   </head>
 
-  <body >
+  <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- Sidebar Toggle Button -->
     <button class="sidebar-toggle" onclick="toggleSidebar()">
       <i class="bi bi-list"></i>
@@ -185,48 +300,48 @@
       
       <div class="sidebar-menu">
         <a href="{% url 'dashboard' %}" class="nav-link">
-          <i class="bi bi-speedometer2"></i> Dashboard
+          <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
         </a>
         
         <div class="menu-divider"></div>
         <a href="{% url 'manage_orders' %}" class="nav-link">
-          <i class="bi bi-credit-card"></i> Postpaid Orders
+          <i class="bi bi-credit-card"></i> <span>Postpaid Orders</span>
         </a>
         <a href="{% url 'manage_paidorders' %}" class="nav-link">
-          <i class="bi bi-wallet2"></i> Prepaid Orders
+          <i class="bi bi-wallet2"></i> <span>Prepaid Orders</span>
         </a>
         
         <div class="menu-divider"></div>
         <a href="{% url 'product_list' %}" class="nav-link">
-          <i class="bi bi-box-seam"></i> Manage Products
+          <i class="bi bi-box-seam"></i> <span>Manage Products</span>
         </a>
         <a href="{% url 'add_product' %}" class="nav-link">
-          <i class="bi bi-plus-circle"></i> Add Product
+          <i class="bi bi-plus-circle"></i> <span>Add Product</span>
         </a>
         <a href="{% url 'manage_all_stock' %}" class="nav-link">
-          <i class="bi bi-archive"></i> Manage Stock
+          <i class="bi bi-archive"></i> <span>Manage Stock</span>
         </a>
         <a href="{% url 'manage_category' %}" class="nav-link">
-          <i class="bi bi-diagram-3"></i> Manage Category
+          <i class="bi bi-diagram-3"></i> <span>Manage Category</span>
         </a>
         
         <div class="menu-divider"></div>
         <a href="{% url 'admin_users' %}" class="nav-link">
-          <i class="bi bi-people"></i> Manage Users
+          <i class="bi bi-people"></i> <span>Manage Users</span>
         </a>
         <a href="{% url 'manage_offers' %}" class="nav-link">
-          <i class="bi bi-tags"></i> Manage Offers
+          <i class="bi bi-tags"></i> <span>Manage Offers</span>
         </a>
         <a href="{% url 'manage_wallets' %}" class="nav-link">
-          <i class="bi bi-cash-stack"></i> Manage Wallets
+          <i class="bi bi-cash-stack"></i> <span>Manage Wallets</span>
         </a>
         <a href="{% url 'coupon_list' %}" class="nav-link">
-          <i class="bi bi-ticket-perforated"></i> Manage Coupons
+          <i class="bi bi-ticket-perforated"></i> <span>Manage Coupons</span>
         </a>
         
         <div class="menu-divider"></div>
         <a href="{% url 'shop' %}" class="nav-link">
-          <i class="bi bi-shop"></i> Users View
+          <i class="bi bi-shop"></i> <span>Users View</span>
         </a>
       </div>
     </div>
@@ -241,14 +356,73 @@
       function toggleSidebar() {
         const sidebar = document.getElementById("sidebar");
         const content = document.getElementById("content");
-
-        sidebar.classList.toggle("open");
-        if (sidebar.classList.contains("open")) {
-          content.style.marginLeft = "250px";
-        } else {
-          content.style.marginLeft = "0";
+        const overlay = document.getElementById("sidebarOverlay");
+        
+        // For mobile view
+        if (window.innerWidth <= 768) {
+          sidebar.classList.toggle("open");
+          overlay.style.display = sidebar.classList.contains("open") ? "block" : "none";
+        } 
+        // For tablet view
+        else if (window.innerWidth <= 992) {
+          sidebar.classList.toggle("collapsed");
+          if (sidebar.classList.contains("collapsed")) {
+            content.style.marginLeft = "70px";
+          } else {
+            content.style.marginLeft = "250px";
+          }
         }
       }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (window.innerWidth <= 768 && 
+            !sidebar.contains(event.target) && 
+            !event.target.classList.contains('sidebar-toggle')) {
+          sidebar.classList.remove('open');
+          overlay.style.display = 'none';
+        }
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
+        const overlay = document.getElementById("sidebarOverlay");
+        
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('open');
+          overlay.style.display = 'none';
+          
+          if (window.innerWidth <= 992) {
+            sidebar.classList.add('collapsed');
+            content.style.marginLeft = "70px";
+          } else {
+            sidebar.classList.remove('collapsed');
+            content.style.marginLeft = "250px";
+          }
+        }
+      });
+
+      // Initialize sidebar based on screen size
+      document.addEventListener("DOMContentLoaded", function() {
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
+        
+        if (window.innerWidth <= 992) {
+          sidebar.classList.add('collapsed');
+          content.style.marginLeft = "70px";
+        }
+        
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('collapsed');
+          sidebar.classList.remove('open');
+          content.style.marginLeft = "0";
+        }
+      });
     </script>
     <script>
       function toggleUpdateForm(userId) {
