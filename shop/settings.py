@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-#58wb-_lmspfz_55u&k5l2t6ccv=9+1z+75rg42lcq!i2tc#fj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['pixp.up.railway.app','https://pixp.up.railway.app','127.0.0.1']
+ALLOWED_HOSTS = ['pixp.up.railway.app','https://pixp.up.railway.app']
 CSRF_TRUSTED_ORIGINS = ['https://pixp.up.railway.app']
 
 
