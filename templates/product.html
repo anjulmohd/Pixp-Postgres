@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block extra_css %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+<link href="{% static 'css/product.css' %}" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-gallery">
+        <!-- Main Image Container -->
+        <div class="main-image-container">
+            <img id="product-image" src="{{ product.image.url }}" alt="{{ product.name }}" class="main-product-image">
+        </div>
+
+        <!-- Thumbnails for All Product Images -->
+        <div class="thumbnail-container">
+          <div class="thumbnail-item">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="thumbnail-image main-product-thumbnail active" data-main-image="{{ product.image.url }}">
+          </div>
+          {% for image in product.images.all %}
+              <div class="thumbnail-item">
+                  <img src="{{ image.image.url }}" alt="{{ image.description|default:product.name }}" 
+                       class="thumbnail-image" data-main-image="{{ image.image.url }}">
+              </div>
+          {% endfor %}
+      </div>
+    </div>
+    
+    <div class="product-info">
+        <h1 id="product-name" class="product-title">{{ product.name }}</h1>
+        
+        <div class="product-rating">
+            <span class="stars">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= product.rating %}
+                        <i class="fas fa-star"></i>
+                    {% elif forloop.counter <= product.rating|add:0.5 %}
+                        <i class="fas fa-star-half-alt"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </span>
+            <span class="rating-value">{{ product.rating }}</span>
+        </div>
+        
+        <div class="product-description">
+            <p>{{ product.description }}</p>
+        </div>
+        
+        <div class="price-container">
+            <div class="current-price">
+                ₹<span id="product-price">{{ product.price }}</span>
+            </div>
+        </div>
+        
+        <div class="stock-info">
+            <span class="stock-label">Availability:</span>
+            <span id="product-stock" class="stock-value {% if product.stock_quantity > 10 %}in-stock{% elif product.stock_quantity > 0 %}low-stock{% else %}out-of-stock{% endif %}">
+                {% if product.stock_quantity > 10 %}
+                    In Stock
+                {% elif product.stock_quantity > 0 %}
+                    Low Stock ({{ product.stock_quantity }} left)
+                {% else %}
+                    Out of Stock
+                {% endif %}
+            </span>
+        </div>
+        
+        <form method="post" action="{% url 'add_to_cart' product.id %}" class="product-form">
+            {% csrf_token %}
+            
+            <div class="variants-section">
+                <h2 class="variants-title">Select Options</h2>
+                <div class="variants-container">
+                    <div class="variant-option">
+                        <label class="variant-label">
+                            <input type="radio" name="variant_id" value="" data-image="{{ product.image.url }}" data-name="{{ product.name }}" data-price="{{ product.price }}" data-stock="{{ product.stock_quantity }}" {% if not selected_variant_id %}checked{% endif %}>
+                            <span class="variant-name">Base Product ({{product.base_product_detail}}) </span>
+                            <span class="variant-price">₹{{ product.price }}</span>
+                        </label>
+                    </div>
+                    
+                    {% for variant in variants %}
+                    <div class="variant-option">
+                        <label class="variant-label">
+                            <input type="radio" name="variant_id" value="{{ variant.id }}" data-image="{% if variant.image %}{{ variant.image.url }}{% else %}{{ product.image.url }}{% endif %}" data-name="{{ variant.product.name }} - {{ variant.name }}" data-price="{{ variant.price }}" data-stock="{{ variant.stock_quantity }}" {% if selected_variant_id == variant.id|stringformat:"s" %}checked{% endif %}>
+                            <span class="variant-name">{{ variant.name }}</span>
+                            <span class="variant-price">₹{{ variant.price }}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="purchase-actions">
+                <div class="quantity-selector">
+                    <label for="quantity" class="quantity-label">Quantity:</label>
+                    <div class="quantity-controls">
+                      <button type="button" class="quantity-btn minus-btn">-</button>
+                      <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" class="quantity-input">
+                      <button type="button" class="quantity-btn plus-btn">+</button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="add-to-cart-btn">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+                
+                <button type="button" class="btn" id="add-to-wishlist"  data-url="{% url 'add_to_wishlist' product.id %}">
+                    <i class="fas fa-heart"></i> Add to Wishlist
+                </button>
+              </div>
+            
+              <a href="javascript:void(0)" onclick="window.print()" class="print-button">
+                  <i class="fas fa-print"></i> Print Product Details
+              </a>
+          </form>
+      </div>
+  </div>
+  
+  <!-- Related Products Section -->
+  <div class="related-products container">
+    <h2 class="related-products-title">You May Also Like</h2>
+    
+    <div class="related-products-grid">
+        {% for related_data in related_products_with_variants %}
+            <!-- Main product -->
+            <div class="product-card">
+                <a href="{% url 'product' related_data.product.id %}" class="product-link text-decoration-none">
+                    <div class="product-image-wrapper">
+                        <img src="{{ related_data.product.image.url }}" alt="{{ related_data.product.name }}" class="product-image">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">{{ related_data.product.name }}</h3>
+                        <p class="product-price">₹{{ related_data.product.price }}</p>
+                    </div>
+                </a>
+            </div>
+
+            
+        {% empty %}
+            <p class="no-products-message">No related products found.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+
+  
+  <script src="{% static 'js/product.js' %}"></script>
+  <script>
+    // Wishlist functionality
+    document.addEventListener("DOMContentLoaded", function() {
+        const wishlistBtn = document.getElementById('add-to-wishlist');
+        
+        wishlistBtn.addEventListener('click', function() {
+            const selectedVariant = document.querySelector('input[name="variant_id"]:checked');
+            const variantId = selectedVariant ? selectedVariant.value : "";
+            
+            const formData = new FormData();
+            formData.append('variant_id', variantId);
+            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // ✅ Get the correct URL
+            const addToWishlistUrl = wishlistBtn.getAttribute('data-url');
+
+            fetch(addToWishlistUrl, {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Product added to wishlist!");
+                } else {
+                    alert(data.message || "❗️ Failed to add to wishlist.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+</script>
+  {% endblock %}

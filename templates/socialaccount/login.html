@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% load i18n %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+    <div class="card-body text-center">
+      <!-- Google Logo -->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1280px-Google_%22G%22_logo.svg.png" alt="Google Logo" class="mb-4" style="width: 50px; height: 50px;">
+      
+      <!-- Heading -->
+      <h1 class="h4 mb-3">{% trans "Login with Google" %}</h1>
+      
+      <!-- Description -->
+      <p class="text-muted mb-4">
+        {% trans "You are about to log in using your Google account. Click the button below to continue." %}
+      </p>
+      
+      <!-- Login Form -->
+      <form method="post" action="{% provider_login_url 'google' process='login' %}">
+        {% csrf_token %}
+        <!-- Google Login Button -->
+        <button type="submit" class="btn btn-outline-primary d-flex align-items-center justify-content-center w-100 py-2">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1280px-Google_%22G%22_logo.svg.png" alt="Google Logo" class="me-2" style="width: 20px; height: 20px;">
+          <span>{% trans "Continue with Google" %}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+<style>
+    .google-btn {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+    .google-btn:hover {
+      background-color: #357abd;
+    }
+    .card {
+      border-radius: 15px;
+    }
+  </style>
+{% endblock %}

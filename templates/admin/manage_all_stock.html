@@ -1,0 +1,77 @@
+{% extends "admin/admin-base.html" %}
+
+{% block content %}
+
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+      
+      <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><span class="breadcrumb__link">Manage Product Stock</span></li>
+    </ul>
+  </section>
+
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Manage Product Stock</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} text-center">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="GET" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center align-middle shadow-sm rounded">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 40%;"> Name</th>
+                    <th style="width: 40%;"> Category</th>
+                    <th style="width: 40%;"> Initial Price</th>
+                    <th style="width: 40%;"> Offered Price</th>
+                    <th style="width: 20%;">Current Stock</th>
+                    <th style="width: 40%;">Update Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td class="fw-bold">{{ product.name }}</td>
+                    <td class="fw-bold">{{ product.category.name }}</td>
+                    <td class="fw-bold">{{ product.price_initial }}</td>
+                    <td class="fw-bold">{{ product.price }} {{ product.discount_type }} </td>
+                    <td>
+                        <span class=" ">
+                            {{ product.stock_quantity }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" class="d-flex justify-content-center align-items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="number" name="quantity" class="form-control text-center" style="width: 80px;" min="1" required>
+                            <button type="submit" name="action" value="add" class="btn btn-outline-success mx-2">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                            <button type="submit" name="action" value="deduct" class="btn btn-outline-danger">
+                                <i class="bi bi-dash-lg"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No products available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

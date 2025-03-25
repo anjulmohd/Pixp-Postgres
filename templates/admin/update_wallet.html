@@ -1,0 +1,61 @@
+{% extends "admin/admin-base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Wallet for {{ wallet.user.username }}</h2>
+    <p><strong>Current Balance:</strong> ₹{{ wallet.balance }}</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="amount" class="form-label">Enter Amount</label>
+            <input type="number" name="amount" id="amount" class="form-control" step="0.01" required>
+        </div>
+
+        <button type="submit" name="action" value="add" class="btn btn-success">Add Funds</button>
+        <button type="submit" name="action" value="deduct" class="btn btn-danger">Deduct Funds</button>
+    </form>
+
+    <h3 class="mt-4">Transaction History</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in wallet.transactions.all %}
+                <tr>
+                    <td>{{ transaction.transaction_unique_id }}</td>  <!-- Added transaction ID here -->
+                    <td>{{ transaction.created_at|date:"M d, Y H:i" }}</td>
+                    <td>₹{{ transaction.amount }}</td>
+                    <td>
+                        {% if transaction.transaction_type == 'CREDIT' %}
+                            <span class="text-success">Credit</span>
+                        {% else %}
+                            <span class="text-danger">Debit</span>
+                        {% endif %}
+                    </td>
+                   
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No transactions found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        
+    </table>
+
+    <a href="{% url 'manage_wallets' %}" class="btn btn-secondary mt-3">Back to Wallets</a>
+</div>
+{% endblock %}

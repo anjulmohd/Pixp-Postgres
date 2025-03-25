@@ -1,0 +1,130 @@
+{% extends 'admin/admin-base.html' %}
+{% block content %}
+
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+        <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><span class="breadcrumb__link">Manage Postpaidpaid orders</span></li>
+    </ul>
+</section>
+
+<div class="container mt-5">
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'manage_orders' %}" class="d-flex mb-3">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search by Order ID, Username, or Email" value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'error' %}alert-danger
+            {% elif message.tags == 'success' %}alert-success
+            {% else %}alert-info
+            {% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="text-center mb-4">Manage Postpaid Orders</h2>
+    <a href="{% url 'sales_dashboard' %}" class="btn-sm btn-primary text-decoration-none">View Sales Dashboard </a>
+    <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
+        <table class="table table-striped w-100" style="table-layout: auto;">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>User</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Total Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in page_obj %}
+                <tr>
+                    <td><strong>#{{ order.order_unique_id }}</strong></td>
+                    <td>{{ order.user.username }} ({{ order.user.email }})</td>
+                    <td>{{ order.created_at|date:"F d, Y - H:i A" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if order.status == 'PENDING' %} bg-warning text-dark
+                            {% elif order.status == 'PROCESSING' %} bg-primary
+                            {% elif order.status == 'SHIPPED' %} bg-info
+                            {% elif order.status == 'DELIVERED' %} bg-success
+                            {% elif order.status == 'CANCELLED' %} bg-danger text-white
+                            {% elif order.status == 'RETURN_REQUESTED' %} bg-secondary text-white
+                            {% elif order.status == 'RETURN_APPROVED' %} bg-dark text-white
+                            {% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td>₹{{ order.total_price }}</td>
+                    <td>
+                        <form method="POST" action="" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <select name="status" class="form-select form-select-sm me-2">
+                                {% for choice in form.fields.status.choices %}
+                                <option value="{{ choice.0 }}" {% if choice.0 == order.status %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-success">Update</button>
+                        </form>
+
+                        {% if order.status == "RETURN_REQUESTED" %}
+                        <a href="{% url 'verify_return_request' order.id %}" class="btn btn-sm btn-warning ">
+                            Verify Return
+                        </a>
+                        {% else %}
+                        <a href="{% url 'verify_return_request' order.id %}" class="btn btn-sm btn-warning">
+                            View Details
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No orders found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Order Pagination">
+        <ul class="pagination justify-content-center mt-4">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1&search={{ search_query }}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+</div>
+{% endblock %}

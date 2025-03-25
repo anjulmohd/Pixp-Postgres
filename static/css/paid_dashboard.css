@@ -1,0 +1,497 @@
+  /* Dashboard Styles */
+  .sales-dashboard {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #f5f7fa;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .dashboard-header {
+    margin-bottom: 2rem;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-header h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 600;
+  }
+
+  .date-filter {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .date-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .date-inputs {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .input-group label {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    color: #7f8c8d;
+  }
+
+  .input-group input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  .filter-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .filter-btn:hover {
+    background-color: #2980b9;
+  }
+
+  /* Summary Cards */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .card-icon.revenue {
+    background-color: #27ae60;
+  }
+
+  .card-icon.orders {
+    background-color: #3498db;
+  }
+
+  .card-icon.avg-order {
+    background-color: #9b59b6;
+  }
+
+  .card-icon.delivery {
+    background-color: #f39c12;
+  }
+
+  .card-content h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    font-weight: 500;
+  }
+
+  .card-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0.3rem 0;
+    color: #2c3e50;
+  }
+
+  .card-trend, .card-ratio {
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0;
+  }
+
+  .card-trend.positive {
+    color: #27ae60;
+  }
+
+  .card-trend.negative {
+    color: #e74c3c;
+  }
+
+  .card-ratio {
+    color: #7f8c8d;
+  }
+
+  /* Charts Section */
+  .charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .chart-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  .chart-card h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+
+  /* Recent Orders Section */
+  .recent-orders {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+
+  .view-all {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .view-all:hover {
+    text-decoration: underline;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .orders-table th {
+    background-color: #f8f9fa;
+    padding: 1rem 0.8rem;
+    text-align: left;
+    color: #7f8c8d;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #ecf0f1;
+  }
+
+  .orders-table td {
+    padding: 1rem 0.8rem;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: 0.95rem;
+  }
+
+  .orders-table tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .status-pending {
+    background-color: #ffeaa7;
+    color: #d35400;
+}
+
+.status-paid {
+    background-color: #81ecec;
+    color: #00b894;
+}
+
+.status-failed {
+    background-color: #ff7675;
+    color: #c0392b;
+}
+
+.status-processed {
+    background-color: #74b9ff;
+    color: #0984e3;
+}
+
+.status-shipped {
+    background-color: #a29bfe;
+    color: #6c5ce7;
+}
+
+.status-delivered {
+    background-color: #55efc4;
+    color: #00b894;
+}
+
+.status-return_requested {
+    background-color: #ffeaa7;
+    color: #e17055;
+}
+
+.status-return_approved {
+    background-color: #dfe6e9;
+    color: #636e72;
+}
+
+.status-cancel_requested {
+    background-color: #fdcb6e;
+    color: #d35400;
+}
+
+.status-cancel_approved {
+    background-color: #b2bec3;
+    color: #2d3436;
+}
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-view, .btn-print {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7f8c8d;
+    font-size: 1rem;
+    padding: 0.3rem;
+    border-radius: 4px;
+  }
+
+  .btn-view:hover, .btn-print:hover {
+    color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 2rem 0;
+    color: #7f8c8d;
+  }
+
+  /* Top Products Section */
+  .top-products {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  .top-products h2 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+
+  .product-image {
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background-color: #ecf0f1;
+    color: #95a5a6;
+    font-size: 0.9rem;
+  }
+
+  .product-details {
+    padding: 1rem;
+  }
+
+  .product-details h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    color: #2c3e50;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-price {
+    color: #16a085;
+    font-weight: 600;
+    margin: 0 0 0.8rem 0;
+  }
+
+  .product-stats {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .stat-value {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .no-data-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: #7f8c8d;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .sales-dashboard {
+      padding: 1rem;
+    }
+    
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .date-form {
+      flex-direction: column;
+    }
+    
+    .charts-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .download-btn {
+    background-color: #047a04;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+  }
+  
+  .download-btn:hover {
+    background-color: #073901;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .button-group {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .filter-btn, .download-btn {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+  }

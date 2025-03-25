@@ -1,0 +1,848 @@
+{% extends 'base.html'%}
+
+{% block content %}
+{% load static%}
+
+
+    <!--=============== BREADCRUMB ===============-->
+    <section class="breadcrumb">
+      <div class="container">
+        <ul class="breadcrumb__list">
+          <li><a href="{% url 'home'%}" class="breadcrumb__link">Home</a></li>
+          <li><span class="mx-2">›</span></li>
+          <li><a href="{% url 'shop'%}" class="breadcrumb__link">Shop</a></li>
+          <li><span class="mx-2">›</span></li>
+          <li><span class="breadcrumb__link">Cart</span></li>
+        </ul>
+      </div>
+    </section>
+    
+    {% if messages %}
+    <div class="container">
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="remove-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
+    <!--=============== CART ===============-->
+    <section class="section">
+      <div class="container">
+        <h2 class="cart-title">Your Shopping Cart</h2>
+        
+        
+        <div class="cart-container">
+          <form method="POST" action="{% url 'update_cart' %}" id="cart-form">
+            {% csrf_token %}
+            <div style="overflow-x: auto;">
+              {% load static %} <!-- Load static files if needed -->
+        
+              <table class="cart-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in cart_items %}
+                  <tr id="cart-item-{{ item.id }}">
+                    <td>
+                      <!-- Display image for product or variant -->
+                      {% if item.product %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="product-image" />
+                      {% elif item.product_variant %}
+                        <img src="{% if item.product_variant.image %}{{ item.product_variant.image.url }}{% else %}{{ item.product_variant.product.image.url }}{% endif %}" alt="{{ item.product_variant.name }}" class="product-image" />
+                      {% endif %}
+                    </td>
+                    <td>
+                      <!-- Display name for product or variant -->
+                      {% if item.product %}
+                      <a href="{% url 'product' item.product.id %}" class="product-name">
+                        {{ item.product.name }}
+                      </a>
+                      {% elif item.product_variant %}
+                      <a href="{% url 'product' item.product_variant.product.id %}?variant_id={{ item.product_variant.id }}" class="product-name">
+                        {{ item.product_variant.product.name }} - {{ item.product_variant.name }}
+                      </a>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <!-- Display price for product or variant -->
+                      <span class="product-price">
+                        ₹{% if item.product %}{{ item.product.price }}{% elif item.product_variant %}{{ item.product_variant.price }}{% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <!-- Quantity input -->
+                      <div class="quantity-group">
+                        <button type="button" class="quantity-btn minus-btn" data-item-id="{{ item.id }}">−</button>
+                        <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" class="quantity-input" data-item-id="{{ item.id }}">
+                        <button type="button" class="quantity-btn plus-btn" data-item-id="{{ item.id }}">+</button>
+                      </div>
+                    </td>
+                    <td>
+                      <!-- Subtotal using get_total_price -->
+                      <div class="subtotal-price" id="subtotal-{{ item.id }}">
+                        ₹{{ item.get_total_price }}
+                      </div>
+                    </td>
+                    <td>
+                      <!-- Remove button -->
+                      <a href="{% url 'remove_from_cart' item.id %}" class="remove-btn">
+                        Remove
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+        
+            <div class="table-actions">
+              <a href="{% url 'shop'%}" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Continue Shopping
+              </a>
+            </div>
+          </form>
+        </div>
+
+
+        
+
+        <div class="cart-grid">
+          <!-- Coupon Section -->
+       
+          <div class="cart-section coupon-container">
+          <br><br>
+            {% if cart.coupon %}
+              <div class="coupon-card applied">
+                <div class="coupon-header">
+                  
+                  <h3 class="section-title">Applied Coupon</h3>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="success-icon" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="coupon-body">
+                  <div class="code-display">
+                    <span class="code-label">Code:</span>
+                    <span class="code-value">{{ cart.coupon.code }}</span>
+                  </div>
+                  <a href="{% url 'remove_coupon' %}" class="remove-btn">
+                    <span>Remove</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              <div class="coupon-card">
+                <h3 class="section-title">Apply Coupon</h3>
+                <form method="POST" action="{% url 'apply_coupon' %}" class="coupon-form">
+                  {% csrf_token %}
+                  <div class="input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="input-icon" width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <input type="text" class="coupon-input" id="coupon_code" name="coupon_code" placeholder="Enter coupon code" required>
+                  </div>
+                  <input type="hidden" name="cart_id" value="{{ cart.id }}">
+                  <button class="btn btn-apply" type="submit">Apply</button>
+                </form>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Cart Total Section -->
+          <div class="cart-section">
+            <h3 class="section-title">Cart Summary</h3>
+            <table class="cart-total-table">
+              <tr>
+                <td class="total-label">Subtotal</td>
+                <td class="total-value">₹{{ total_price }}</td>
+              </tr>
+              <tr>
+                <td class="total-label">Shipping</td>
+                <td class="total-value">
+                  <span class="badge badge-success">Free</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="total-label">Coupon</td>
+                <td class="total-value">
+                  {% if cart.coupon %}
+                    <span class="badge badge-primary">{{ cart.coupon.code }}</span>
+                  {% else %}
+                    <span style="color: var(--gray-500); font-size: 0.875rem;">No coupon applied</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <td class="total-label" style="font-weight: 600;">Total</td>
+                <td class="total-value total-final">
+                  {% if cart.coupon %}
+                    ₹{{ cart.discounted_price }}
+                  {% else %}
+                    ₹{{ total_price }}
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+            <a href="{% url 'checkout' %}" class="btn btn-primary checkout-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Proceed to Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <style>
+      /* Custom Styles for Cart Page */
+      :root {
+          --primary-color: #3b82f6;
+          --primary-dark: #2563eb;
+          --primary-light: #dbeafe;
+          --gray-50: #f9fafb;
+          --gray-100: #f3f4f6;
+          --gray-200: #e5e7eb;
+          --gray-300: #d1d5db;
+          --gray-400: #9ca3af;
+          --gray-500: #6b7280;
+          --gray-600: #4b5563;
+          --gray-700: #374151;
+          --gray-800: #1f2937;
+          --gray-900: #111827;
+          --red-500: #ef4444;
+          --red-600: #dc2626;
+          --red-700: #b91c1c;
+          --green-50: #f0fdf4;
+          --green-500: #22c55e;
+          --green-600: #16a34a;
+          --green-700: #15803d;
+          --blue-50: #eff6ff;
+          --blue-500: #3b82f6;
+          --blue-600: #2563eb;
+      }
+
+      /* General Styles */
+      .section {
+          padding: 4rem 0;
+      }
+
+      
+      form button {
+margin-top: 0px;  /* Space above the submit button */
+}
+
+      /* Breadcrumb */
+      .breadcrumb {
+          background-color: var(--gray-50);
+          padding: 0.75rem 0;
+          margin-bottom: 1rem;
+      }
+
+      .breadcrumb__list {
+          display: flex;
+          align-items: center;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          font-size: 0.875rem;
+          color: var(--gray-600);
+      }
+
+      .breadcrumb__link {
+          color: var(--gray-600);
+          text-decoration: none;
+          transition: color 0.2s ease;
+      }
+
+      .breadcrumb__link:hover {
+          color: var(--primary-color);
+      }
+
+      /* Messages */
+      .messages {
+          margin-bottom: 1.5rem;
+      }
+
+      .alert {
+          padding: 1rem;
+          border-radius: 0.5rem;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          font-size: 0.875rem;
+      }
+
+      .alert-danger {
+          background-color: #fee2e2;
+          color: var(--red-700);
+      }
+
+      .alert-success {
+          background-color: var(--green-50);
+          color: var(--green-700);
+      }
+
+      .alert-info {
+          background-color: var(--blue-50);
+          color: var(--blue-600);
+      }
+
+      /* Cart Table */
+      .cart-container {
+          background-color: white;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          overflow: hidden;
+          margin-bottom: 2rem;
+      }
+
+      .cart-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 2rem;
+          color: var(--gray-800);
+      }
+
+      .cart-table {
+          width: 100%;
+          border-collapse: collapse;
+      }
+
+      .cart-table th {
+          background-color: var(--gray-50);
+          color: var(--gray-600);
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          padding: 1rem 1.5rem;
+          text-align: left;
+      }
+
+      .cart-table td {
+          padding: 1.5rem;
+          border-bottom: 1px solid var(--gray-200);
+          vertical-align: middle;
+      }
+
+      .cart-table tr:last-child td {
+          border-bottom: none;
+      }
+
+      .cart-table tr:hover {
+          background-color: var(--gray-50);
+      }
+
+      .product-image {
+          width: 5rem;
+          height: 5rem;
+          object-fit: cover;
+          border-radius: 0.375rem;
+          border: 1px solid var(--gray-200);
+      }
+
+      .product-name {
+          font-weight: 600;
+          color: var(--gray-800);
+          text-decoration: none;
+          margin-bottom: 0.25rem;
+          display: block;
+          transition: color 0.2s ease;
+      }
+
+      .product-name:hover {
+          color: var(--primary-color);
+      }
+
+      .product-category {
+          font-size: 0.875rem;
+          color: var(--gray-500);
+          text-decoration: none;
+          transition: color 0.2s ease;
+      }
+
+      .product-category:hover {
+          color: var(--primary-color);
+      }
+
+      .product-price {
+          font-weight: 600;
+          color: var(--gray-800);
+      }
+
+      /* Quantity Input */
+      .quantity-group {
+          display: flex;
+          align-items: center;
+          max-width: 8rem;
+          border: 1px solid var(--gray-300);
+          border-radius: 0.375rem;
+          overflow: hidden;
+      }
+
+      .quantity-btn {
+          background-color: var(--gray-100);
+          border: none;
+          padding: 0.5rem 0.75rem;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+      }
+
+      .quantity-btn:hover {
+          background-color: var(--gray-200);
+      }
+
+      .quantity-input {
+          flex-grow: 1;
+          text-align: center;
+          border: none;
+          border-left: 1px solid var(--gray-300);
+          border-right: 1px solid var(--gray-300);
+          padding: 0.5rem 0;
+          width: 3rem;
+      }
+
+      .quantity-input:focus {
+          outline: none;
+      }
+
+      /* Subtotal */
+      .subtotal-text {
+          font-size: 0.875rem;
+          color: var(--gray-500);
+          margin-bottom: 0.25rem;
+      }
+
+      .subtotal-price {
+          font-weight: 600;
+          color: var(--gray-800);
+      }
+
+      /* Remove Button */
+      .remove-btn {
+          display: flex;
+          align-items: center;
+          color: var(--red-600);
+          background: none;
+          border: none;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: color 0.2s ease;
+      }
+
+      .remove-btn:hover {
+          color: var(--red-700);
+      }
+
+      .remove-icon {
+          margin-right: 0.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+      }
+
+      /* Button Styles */
+      .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          font-weight: 500;
+          text-decoration: none;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          border: 1px solid transparent;
+      }
+
+      .btn-secondary {
+          background-color: white;
+          border-color: var(--gray-300);
+          color: var(--gray-700);
+      }
+
+      .btn-secondary:hover {
+          background-color: var(--gray-50);
+      }
+
+      .btn-primary {
+          background-color: var(--primary-color);
+          color: white;
+          border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+          background-color: var(--primary-dark);
+      }
+
+      .btn-icon {
+          margin-right: 0.5rem;
+      }
+
+      /* Cart Totals and Coupon Sections */
+      .cart-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+      }
+
+      @media (min-width: 992px) {
+          .cart-grid {
+              grid-template-columns: 1fr 1fr;
+          }
+      }
+
+      .cart-section {
+          background-color: white;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          padding: 1.5rem;
+      }
+
+      .section-title {
+          font-size: 1.125rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--gray-200);
+          color: var(--gray-800);
+      }
+
+      /* Coupon */
+      .coupon-form {
+          display: flex;
+          margin-top: 1rem;
+      }
+
+      .coupon-input {
+          flex-grow: 1;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid var(--gray-300);
+          border-right: none;
+          border-top-left-radius: 0.375rem;
+          border-bottom-left-radius: 0.375rem;
+      }
+
+      .coupon-input:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 1px var(--primary-light);
+      }
+
+      .applied-coupon {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background-color: var(--green-50);
+          padding: 1rem;
+          border-radius: 0.5rem;
+          margin-top: 1rem;
+      }
+
+      .coupon-code {
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+      }
+
+      .coupon-icon {
+          color: var(--green-600);
+          margin-right: 0.5rem;
+          width: 1.25rem;
+          height: 1.25rem;
+      }
+
+      /* Cart Total */
+      .cart-total-table {
+          width: 100%;
+      }
+
+      .cart-total-table tr {
+          border-bottom: 1px solid var(--gray-200);
+      }
+
+      .cart-total-table tr:last-child {
+          border-bottom: none;
+      }
+
+      .cart-total-table td {
+          padding: 0.75rem 0;
+      }
+
+      .total-label {
+          color: var(--gray-600);
+      }
+
+      .total-value {
+          text-align: right;
+          font-weight: 500;
+      }
+
+      .total-final {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--primary-color);
+      }
+
+      .badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.25rem 0.5rem;
+          border-radius: 9999px;
+          font-size: 0.75rem;
+          font-weight: 500;
+      }
+
+      .badge-success {
+          background-color: var(--green-50);
+          color: var(--green-700);
+      }
+
+      .badge-primary {
+          background-color: var(--blue-50);
+          color: var(--blue-600);
+      }
+
+      .checkout-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding: 0.75rem 1.5rem;
+          margin-top: 1rem;
+          font-size: 1rem;
+      }
+      
+      /* Table actions */
+      .table-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 1.5rem;
+          background-color: var(--gray-50);
+          border-top: 1px solid var(--gray-200);
+      }
+      .coupon-container {
+margin: 20px 0;
+}
+
+.coupon-card {
+border: 1px solid #e2e8f0;
+border-radius: 8px;
+padding: 20px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+background: #fff;
+transition: all 0.3s ease;
+}
+
+.coupon-card:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.coupon-card.applied {
+border-left: 4px solid #10b981;
+background: linear-gradient(to right, #f0fdf4, #ffffff);
+}
+
+.coupon-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 15px;
+}
+
+.section-title {
+font-size: 16px;
+font-weight: 600;
+color: #1e293b;
+margin: 0;
+}
+
+.success-icon {
+width: 24px;
+height: 24px;
+color: #10b981;
+}
+
+.coupon-body {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.code-display {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.code-label {
+font-size: 14px;
+color: #64748b;
+}
+
+.code-value {
+font-weight: 600;
+color: #0f172a;
+background: #f1f5f9;
+padding: 4px 10px;
+border-radius: 4px;
+letter-spacing: 0.5px;
+}
+
+.coupon-form {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-top: 12px;
+}
+
+.input-wrapper {
+position: relative;
+flex: 1;
+}
+
+.input-icon {
+position: absolute;
+left: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: #94a3b8;
+}
+
+.coupon-input {
+width: 100%;
+padding: 10px 10px 10px 40px;
+border: 1px solid #e2e8f0;
+border-radius: 6px;
+font-size: 14px;
+transition: border-color 0.2s;
+}
+
+.coupon-input:focus {
+outline: none;
+border-color: #3b82f6;
+box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.coupon-input::placeholder {
+color: #94a3b8;
+}
+
+.btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+padding: 10px 16px;
+border: none;
+border-radius: 6px;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.btn-apply {
+background: #3b82f6;
+color: white;
+}
+
+.btn-apply:hover {
+background: #2563eb;
+}
+
+.remove-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+color: #ef4444;
+font-size: 14px;
+font-weight: 500;
+text-decoration: none;
+padding: 6px 12px;
+border-radius: 6px;
+transition: all 0.2s;
+}
+
+.remove-btn:hover {
+background: #fee2e2;
+}
+
+.btn-icon, .input-icon {
+stroke-width: 2;
+}
+  </style>
+    <!-- JavaScript for quantity buttons -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const minusBtns = document.querySelectorAll('.minus-btn');
+        const plusBtns = document.querySelectorAll('.plus-btn');
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const cartForm = document.getElementById('cart-form');
+    
+        minusBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('input');
+            const value = parseInt(input.value);
+            if (value > 1) {
+              input.value = value - 1;
+              cartForm.submit(); // Submit the form
+            }
+          });
+        });
+    
+        plusBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const input = this.parentNode.querySelector('input');
+            input.value = parseInt(input.value) + 1;
+            cartForm.submit(); // Submit the form
+          });
+        });
+    
+        quantityInputs.forEach(input => {
+          input.addEventListener('change', function() {
+            cartForm.submit(); // Submit the form when the input value changes
+          });
+        });
+      });
+    </script>
+{% endblock content %}

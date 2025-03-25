@@ -1,0 +1,662 @@
+{% load static %}
+<nav class="navbar container-fluid">
+  <!-- Logo Section -->
+  <a href="{% url 'home'%}" class="navbar__logo">
+    <img class="navbar__logo-img" src="{% static 'images/logo1.png'%}" alt="website logo" />
+  </a>
+  
+  <!-- Mobile Menu Toggle -->
+  <div class="navbar__toggle" id="navbar-toggle">
+    <div class="hamburger">
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+      <span class="hamburger__line"></span>
+    </div>
+  </div>
+  
+  <!-- Main Menu -->
+  <div class="navbar__menu" id="navbar-menu">
+    <div class="navbar__menu-header">
+      <a href="{% url 'home'%}" class="navbar__menu-logo">
+        <img src="{% static 'images/logo1.png'%}" alt="website logo" />
+      </a>
+      <div class="navbar__close" id="navbar-close">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    
+    <ul class="navbar__list">
+      <li class="navbar__item">
+        <a href="{% url 'home' %}" class="navbar__link {% if request.path == '/' %}navbar__link--active{% endif %}">
+          <i class="fas fa-home navbar__icon"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="navbar__item">
+        <a href="{% url 'shop' %}" class="navbar__link {% if request.path == '/shop/' %}navbar__link--active{% endif %}">
+          <i class="fas fa-store navbar__icon"></i>
+          <span>Shop</span>
+        </a>
+      </li>
+      <li class="navbar__item">
+        <a href="{% url 'profile_view' %}" class="navbar__link {% if request.path == '/user/' %}navbar__link--active{% endif %}">
+          <i class="fas fa-user navbar__icon"></i>
+          <span>My Account</span>
+        </a>
+      </li>
+      
+      
+      {% if user.is_superuser %}
+      <li class="navbar__item">
+        <a href="{% url 'product_list'%}" class="navbar__link {% if request.path == '/compare/' %}navbar__link--active{% endif %}">
+          <i class="fas fa-tools navbar__icon"></i>
+          <span>Admin's View</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Dropdown Menu Example -->
+      <li class="navbar__item navbar__item--has-dropdown">
+        <a href="#" class="navbar__link">
+          <i class="fas fa-globe navbar__icon"></i>
+          <span>Categories</span>
+          <i class="fas fa-chevron-down navbar__dropdown-icon"></i>
+        </a>
+        <ul class="navbar__dropdown">
+          
+          <li><a href="{% url 'category' pk=2 %}" class="navbar__dropdown-link">Mobiles</a></li>
+          <li><a href="{% url 'category' pk=3 %}" class="navbar__dropdown-link">Laptops</a></li>
+          
+          
+        </ul>
+      </li>
+    </ul>
+    
+    <!-- Search Form -->
+   
+    <div class="navbar__search">
+      
+      <form method="GET" action="{% url 'shop' %}" class="search-form">
+       
+        <div class="search-container">
+          
+          <input
+            type="text"
+            placeholder="Search For Products..."
+            class="search-input"
+            name="q"
+            value="{{ query|default_if_none:'' }}"
+          />
+          <button class="search-button" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+       
+        </div>
+      </form>
+     
+    </div>
+    
+  </div>
+  
+  <!-- Action Buttons -->
+  <div class="navbar__actions">
+    <a href="{% url 'view_wishlist'%}" class="navbar__action-btn" title="Wishlist">
+      <div class="action-icon-container">
+        <i class="fas fa-heart navbar__action-icon"></i>
+        {% if wishlist_count > 0 %}
+        <span class="navbar__action-count">{{ wishlist_count }}</span>
+        {% endif %}
+      </div>
+    </a>
+    
+    <a href="{% url 'view_cart'%}" class="navbar__action-btn" title="Cart">
+      <div class="action-icon-container">
+        <i class="fas fa-shopping-cart navbar__action-icon"></i>
+        {% if cart_count > 0 %}
+        <span class="navbar__action-count">{{ cart_count }}</span>
+        {% endif %}
+      </div>
+    </a>
+    
+    <div class="navbar__user">
+      <div class="navbar__user-btn">
+        <i class="fas fa-user-circle navbar__action-icon"></i>
+      </div>
+      <div class="navbar__user-dropdown">
+        <a href="{% url 'profile_view'%}" class="navbar__dropdown-link">
+          <i class="fas fa-user-circle navbar__dropdown-icon"></i>
+          <span>Profile</span>
+        </a>
+        <a href="{% url 'wallet_detail'%}" class="navbar__dropdown-link">
+          <i class="fas fa-wallet navbar__dropdown-icon"></i>
+          <span>Wallet</span>
+        </a>
+        <a href="" class="navbar__dropdown-link">
+          <i class="fas fa-box navbar__dropdown-icon"></i>
+          <span>Orders</span>
+        </a>
+        <a href="{% url 'logout' %}" class="navbar__dropdown-link">
+          <i class="fas fa-sign-out-alt navbar__dropdown-icon"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Modern Navbar Styles */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #ffffff, #f8f9fa);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+/* Logo Styles */
+.navbar__logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar__logo-img {
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.navbar__logo-img:hover {
+  transform: scale(1.05);
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  cursor: pointer;
+}
+
+.hamburger__line {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px auto;
+  background-color: #333;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Main Menu Styles */
+.navbar__menu {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.navbar__menu-header {
+  display: none;
+}
+
+.navbar__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.navbar__item {
+  position: relative;
+}
+
+.navbar__link {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.navbar__link:hover {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.navbar__link--active {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.1);
+  font-weight: 600;
+}
+
+.navbar__icon {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Dropdown Menu */
+.navbar__dropdown-icon {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.navbar__item--has-dropdown:hover .navbar__dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.navbar__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 100;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.navbar__item--has-dropdown:hover .navbar__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.navbar__dropdown-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.navbar__dropdown-link:hover {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.navbar__dropdown-icon {
+  margin-right: 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Search Form */
+.navbar__search {
+  margin-left: 1rem;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.search-container:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  color: #333;
+  width: 200px;
+  outline: none;
+}
+
+.search-button {
+  background: transparent;
+  border: none;
+  color: #555;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.search-button:hover {
+  color: #2563eb;
+}
+
+/* Action Buttons */
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar__action-btn {
+  position: relative;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.action-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.navbar__action-btn:hover .action-icon-container {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  transform: translateY(-2px);
+}
+
+.navbar__action-icon {
+  font-size: 1.2rem;
+}
+
+.navbar__action-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.5);
+}
+
+/* User Dropdown */
+.navbar__user {
+  position: relative;
+}
+
+.navbar__user-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  transition: all 0.2s ease;
+}
+
+.navbar__user-btn:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.navbar__user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 100;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.navbar__user:hover .navbar__user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+  
+  .hamburger {
+    display: block;
+  }
+  
+  .navbar__menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    max-width: 350px;
+    height: 100vh;
+    background-color: white;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar__menu.active {
+    left: 0;
+  }
+  .navbar__menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .navbar__close {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #555;
+    transition: color 0.2s ease;
+  }
+  
+  .navbar__close:hover {
+    color: #ef4444;
+  }
+  
+  .navbar__list {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.25rem;
+  }
+  
+  .navbar__item {
+    width: 100%;
+  }
+  
+  .navbar__link {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  
+  .navbar__dropdown {
+    position: static;
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    display: none;
+    margin-top: 0;
+    padding: 0;
+    padding-left: 1rem;
+  }
+  
+  .navbar__item--has-dropdown.active .navbar__dropdown {
+    display: block;
+  }
+  
+  .navbar__search {
+    width: 100%;
+    margin: 1rem 0;
+  }
+  
+  .search-container {
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}
+
+/* Animation for hamburger menu */
+@media (max-width: 992px) {
+  .navbar__toggle.active .hamburger__line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  
+  .navbar__toggle.active .hamburger__line:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .navbar__toggle.active .hamburger__line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+}
+
+/* Additional Hover Effects */
+.navbar__link {
+  position: relative;
+}
+
+.navbar__link:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: #2563eb;
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.navbar__link:hover:after,
+.navbar__link--active:after {
+  width: 70%;
+}
+
+/* Smooth scrolling for page navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Glassmorphism effect on scroll */
+.navbar.scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+}
+ 
+
+
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+// Elements
+const navbarToggle = document.getElementById('navbar-toggle');
+const navbarMenu = document.getElementById('navbar-menu');
+const navbarClose = document.getElementById('navbar-close');
+const dropdownItems = document.querySelectorAll('.navbar__item--has-dropdown');
+const navbar = document.querySelector('.navbar');
+
+// Toggle mobile menu
+navbarToggle.addEventListener('click', function() {
+navbarToggle.classList.toggle('active');
+navbarMenu.classList.toggle('active');
+document.body.classList.toggle('no-scroll');
+});
+
+// Close mobile menu
+navbarClose.addEventListener('click', function() {
+navbarToggle.classList.remove('active');
+navbarMenu.classList.remove('active');
+document.body.classList.remove('no-scroll');
+});
+
+// Dropdown functionality for mobile
+dropdownItems.forEach(item => {
+const link = item.querySelector('.navbar__link');
+
+if (window.innerWidth <= 992) {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    item.classList.toggle('active');
+    
+    // Close other open dropdowns
+    dropdownItems.forEach(otherItem => {
+      if (otherItem !== item) {
+        otherItem.classList.remove('active');
+      }
+    });
+  });
+}
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+if (!navbarMenu.contains(e.target) && !navbarToggle.contains(e.target) && window.innerWidth <= 992) {
+  navbarToggle.classList.remove('active');
+  navbarMenu.classList.remove('active');
+  document.body.classList.remove('no-scroll');
+}
+});
+
+// Add scrolled class to navbar on scroll
+window.addEventListener('scroll', function() {
+if (window.scrollY > 50) {
+  navbar.classList.add('scrolled');
+} else {
+  navbar.classList.remove('scrolled');
+}
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+if (window.innerWidth > 992) {
+  // Reset mobile menu state
+  navbarToggle.classList.remove('active');
+  navbarMenu.classList.remove('active');
+  document.body.classList.remove('no-scroll');
+  
+  // Reset dropdown click events
+  dropdownItems.forEach(item => {
+    item.classList.remove('active');
+  });
+}
+});
+});
+  </script>

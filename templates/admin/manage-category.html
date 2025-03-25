@@ -1,0 +1,182 @@
+{% extends "admin/admin-base.html" %}
+
+{% block content %}
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex">
+      
+      <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><span class="breadcrumb__link">Manage Categories</span></li>
+    </ul>
+  </section>
+<style>
+    /* Custom styling */
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 15px;
+    border-radius: 5px;
+    text-align: center;
+    transition: background 0.3s;
+    height: 100%; /* Ensures it fills the height */
+}
+
+    .btn-primary {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #dc2626;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.8;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #f3f4f6;
+    }
+
+    .form-inline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .no-data {
+        text-align: center;
+        font-style: italic;
+    }
+</style>
+{% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+<div class="container">
+    
+    <h2>Manage Categories</h2>
+
+    <!-- Add Category Form -->
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data" class="category-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Category Name:</label>
+                {{ form.name }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_description">Description:</label>
+                {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_description">Image :</label>
+                {{ form.image }}
+            </div>
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- Category List -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                   
+                    <th>Description</th>
+                    <th>On Sale</th>
+                    <th>Discount (%)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.id }}</td>
+                    <td>{{ category.name }}</td>
+                   
+                    <td>{{ category.description }}</td>
+                    <td>
+                        <form method="post" action="{% url 'toggle_sale' category.id %}">
+                            {% csrf_token %}
+                            <input type="checkbox" name="is_sale" {% if category.is_sale %}checked{% endif %} onchange="this.form.submit()">
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'update_discount' category.id %}" class="form-inline">
+                            {% csrf_token %}
+                            <input type="number" name="sale_percentage" value="{{ category.sale_percentage }}" min="0" max="100" step="0.1" required>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'delete_category' category.id %}" onsubmit="return confirm('Are you sure?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn align-items-center ">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="no-data">No categories available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

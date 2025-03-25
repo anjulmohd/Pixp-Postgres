@@ -1,0 +1,145 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <!-- Header Section with Status-based Styling -->
+        <h2 class="text-center mb-4 {% if order.status == 'RETURN_REQUESTED' %}text-primary{% elif order.status == 'CANCEL_REQUESTED' %}text-warning{% else %}text-dark{% endif %}">
+            {% if order.status == "RETURN_REQUESTED" %}
+                <i class="bi bi-arrow-return-left me-2"></i> Verify Return Request
+            {% elif order.status == "CANCEL_REQUESTED" %}
+                <i class="bi bi-x-circle me-2"></i> Verify Cancel Request
+            {% else %}
+                <i class="bi bi-box-seam me-2"></i> Order Details
+            {% endif %}
+        </h2>
+
+        <!-- Messages Display -->
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %} alert-dismissible fade show"
+                role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Order Information Card -->
+        <div class="border rounded p-3 mb-4 bg-light">
+            <p><strong><i class="bi bi-upc-scan me-2"></i> Order ID:</strong> <span class="text-dark">#{{ order.order_unique_id }}</span></p>
+            <p><strong><i class="bi bi-person-circle me-2"></i> User:</strong> <span class="text-dark">{{ order.user.username }} ({{ order.user.email }})</span></p>
+            <p><strong><i class="bi bi-tag me-2"></i> Status:</strong> 
+                <span class="badge {% if order.status == 'RETURN_REQUESTED' %}bg-primary{% elif order.status == 'CANCEL_REQUESTED' %}bg-warning text-dark{% else %}bg-success{% endif %} rounded-pill px-3 py-2">
+                    {{ order.status }}
+                </span>
+            </p>
+            <p><strong><i class="bi bi-calendar-check me-2"></i> Order Date:</strong> <span class="text-secondary">{{ order.created_at|date:"F d, Y - H:i A" }}</span></p>
+            {% if order.reason %}
+            <p><strong><i class="bi bi-chat-left-quote me-2"></i> Reason:</strong> <span class="text-dark">{{ order.reason }}</span></p>
+            {% endif %}
+        </div>
+
+        <!-- Order Items Section -->
+        <h3 class="mb-3 text-secondary"><i class="bi bi-cart-check me-2"></i> Ordered Items</h3>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Return Status</th>
+                        <th>Reason</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr {% if item.return_requested %}class="bg-light"{% endif %}>
+                        <td>
+                            {% if item.product_variant %}
+                                {{ item.product_variant.product.name }} - {{ item.product_variant.name }}
+                            {% else %}
+                                {{ item.product.name }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary bg-opacity-10 text-dark px-3 py-2 rounded-pill">
+                                {{ item.quantity }}
+                            </span>
+                        </td>
+                        <td class="text-end">₹{% if item.product_variant %}{{ item.product_variant.price }}{% else %}{{ item.product.price }}{% endif %}</td>
+                        <td class="text-end fw-bold">₹{{ item.get_total_price }}</td>
+                        <td class="text-center">
+                            {% if item.return_approved %}
+                                <span class="badge bg-success bg-opacity-75 text-white px-3 py-2 rounded-pill">
+                                    <i class="bi bi-check-circle me-1"></i> Return Approved
+                                </span>
+                            {% elif item.return_requested %}
+                                <span class="badge bg-warning bg-opacity-75 text-white px-3 py-2 rounded-pill">
+                                    <i class="bi bi-arrow-return-left me-1"></i> Return Requested
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary bg-opacity-75 text-white px-3 py-2 rounded-pill">
+                                    <i class="bi bi-x-circle me-1"></i> No Request
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.reason %}
+                                <p class="mb-0 small">{{ item.reason }}</p>
+                            {% else %}
+                                <span class="text-muted small">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if item.return_approved %}
+                                <span class="text-success fw-bold">✅ Return Approved</span>
+                            {% elif item.return_requested %}
+                                <form method="POST" action="{% url 'approve_postitem_return_request' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Approve
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted small">No Action</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="d-flex justify-content-between mt-4">
+            <div>
+                <a href="{% url 'manage_orders' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2 me-2">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Orders
+                </a>
+                <a href="{% url 'sales_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                    <i class="bi bi-speedometer2 me-1"></i> Back to Dashboard
+                </a>
+            </div>
+            
+            {% if order.status == 'RETURN_REQUESTED' or order.status == 'CANCEL_REQUESTED' %}
+            <div>
+                <button type="button" class="btn btn-primary rounded-pill px-4 py-2">
+                    <i class="bi bi-check-circle me-1"></i> Approve Request
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<style>
+    .table thead tr th:nth-child(2), .table tbody tr td:nth-child(2) {
+        width: 191px;
+    }
+</style>
+{% endblock %}

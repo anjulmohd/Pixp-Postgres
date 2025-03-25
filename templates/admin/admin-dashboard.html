@@ -1,0 +1,485 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2 class="dashboard-title mb-4">Admin Dashboard</h2>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4">
+      <div class="col-md-4">
+          <div class="dashboard-card">
+              <div class="dashboard-icon bg-gradient-primary">
+                  <i class="fas fa-shopping-cart"></i>
+              </div>
+              <div class="dashboard-info">
+                  <h5>Total Orders</h5>
+                  <h2>{{ total_combined_count }}</h2>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="dashboard-card">
+              <div class="dashboard-icon bg-gradient-success">
+                  <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div class="dashboard-info">
+                  <h5>Total Revenue</h5>
+                  <h2>₹{{ total_combined_price|floatformat:2 }}</h2>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-4">
+          <div class="dashboard-card">
+              <div class="dashboard-icon bg-gradient-warning">
+                  <i class="fas fa-user-cog"></i>
+              </div>
+              <div class="dashboard-info">
+                  <h5>Admin</h5>
+                  <h2>{{ user.username }}</h2>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4 mt-4">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="fas fa-chart-line me-2"></i>Revenue Trends</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h5><i class="fas fa-chart-pie me-2"></i>Orders Overview</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <!-- Best-Selling Products -->
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-header premium">
+                    <h5><i class="fas fa-fire me-2"></i>Best-Selling Products</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="bestSellingProductsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best-Selling Categories -->
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="chart-header premium success">
+                    <h5><i class="fas fa-trophy me-2"></i>Best-Selling Categories</h5>
+                </div>
+                <div class="chart-body">
+                    <canvas id="bestSellingCategoriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #4895ef;
+    --success-color: #4cc9f0;
+    --warning-color: #f72585;
+    --dark-color: #3a0ca3;
+    --light-color: #f8f9fa;
+    --card-border-radius: 16px;
+    --transition-speed: 0.3s;
+}
+
+body {
+    background-color: #f5f7fa;
+    
+}
+
+.dashboard-title {
+    font-weight: 700;
+    color: var(--dark-color);
+    font-size: 2rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.dashboard-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    border-radius: 10px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px;
+    border-radius: var(--card-border-radius);
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: all var(--transition-speed) ease;
+    border-left: 5px solid transparent;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.col-md-4:nth-child(1) .dashboard-card {
+    border-left-color: var(--primary-color);
+}
+
+.col-md-4:nth-child(2) .dashboard-card {
+    border-left-color: var(--success-color);
+}
+
+.col-md-4:nth-child(3) .dashboard-card {
+    border-left-color: var(--warning-color);
+}
+
+.dashboard-icon {
+    font-size: 2rem;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, var(--success-color), #56cfe1);
+    color: white;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, var(--warning-color), #b5179e);
+    color: white;
+}
+
+.dashboard-info {
+    text-align: right;
+}
+
+.dashboard-info h5 {
+    margin-bottom: 8px;
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dashboard-info h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #343a40;
+    margin: 0;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+    height: 100%;
+}
+
+.chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    padding: 20px;
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #e9ecef;
+}
+
+.chart-header.premium {
+    background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+}
+
+.chart-header.success {
+    background: linear-gradient(to right, var(--success-color), #56cfe1);
+}
+
+.chart-header h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #495057;
+}
+
+.chart-header.premium h5, .chart-header.success h5 {
+    color: white;
+}
+
+.chart-body {
+    padding: 20px;
+}
+
+/* For better spacing on mobile */
+@media (max-width: 768px) {
+    .dashboard-card {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<!-- Chart.js for Interactive Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // Fetch JSON data from Django safely
+      var graphData = JSON.parse('{{ graph_data|safe }}');
+      var pieData = JSON.parse('{{ pie_chart_data|safe }}');
+      var bestSellingProducts = JSON.parse('{{ best_selling_products|safe }}');
+      var bestSellingCategories = JSON.parse('{{ best_selling_categories|safe }}');
+
+      var months = graphData.months;
+      var revenues = graphData.revenues;
+      var orderLabels = pieData.labels;
+      var orderCounts = pieData.data;
+      var orderColors = pieData.colors;
+
+      var productLabels = bestSellingProducts.labels;
+      var productData = bestSellingProducts.data;
+
+      var categoryLabels = bestSellingCategories.labels;
+      var categoryData = bestSellingCategories.data;
+
+      // Revenue Chart
+      var revenueCtx = document.getElementById('revenueChart').getContext('2d');
+      var revenueGradient = revenueCtx.createLinearGradient(0, 0, 0, 300);
+      revenueGradient.addColorStop(0, 'rgba(67, 97, 238, 0.7)');
+      revenueGradient.addColorStop(1, 'rgba(67, 97, 238, 0.1)');
+      
+      var revenueChart = new Chart(revenueCtx, {
+          type: 'line',
+          data: {
+              labels: months,
+              datasets: [{
+                  label: 'Revenue (₹)',
+                  data: revenues,
+                  backgroundColor: revenueGradient,
+                  borderColor: '#4361ee',
+                  borderWidth: 2,
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: '#4361ee',
+                  pointBorderColor: '#fff',
+                  pointBorderWidth: 2,
+                  pointRadius: 5,
+                  pointHoverRadius: 7
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: { 
+                      beginAtZero: true,
+                      grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                      }
+                  },
+                  x: {
+                      grid: {
+                          display: false
+                      }
+                  }
+              },
+              plugins: { 
+                  legend: { display: true },
+                  tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      titleFont: {
+                          size: 14
+                      },
+                      bodyFont: {
+                          size: 13
+                      },
+                      padding: 15,
+                      cornerRadius: 8
+                  }
+              }
+          }
+      });
+
+      // Orders Pie Chart
+      var ordersCtx = document.getElementById('ordersChart').getContext('2d');
+      var ordersChart = new Chart(ordersCtx, {
+          type: 'doughnut',
+          data: {
+              labels: orderLabels,
+              datasets: [{
+                  data: orderCounts,
+                  backgroundColor: orderColors,
+                  borderWidth: 2,
+                  borderColor: '#ffffff'
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: { 
+                  legend: { 
+                      position: 'right',
+                      labels: {
+                          font: {
+                              size: 12
+                          },
+                          padding: 20
+                      }
+                  },
+                  tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      titleFont: {
+                          size: 14
+                      },
+                      bodyFont: {
+                          size: 13
+                      },
+                      padding: 15,
+                      cornerRadius: 8
+                  }
+              },
+              cutout: '65%'
+          }
+      });
+
+      // Best-Selling Products Chart
+      var bestSellingProductsCtx = document.getElementById('bestSellingProductsChart').getContext('2d');
+      var productsGradient = bestSellingProductsCtx.createLinearGradient(0, 0, 0, 300);
+      productsGradient.addColorStop(0, 'rgba(247, 37, 133, 0.8)');
+      productsGradient.addColorStop(1, 'rgba(247, 37, 133, 0.2)');
+      
+      var bestSellingProductsChart = new Chart(bestSellingProductsCtx, {
+          type: 'bar',
+          data: {
+              labels: productLabels,
+              datasets: [{
+                  label: 'Units Sold',
+                  data: productData,
+                  backgroundColor: productsGradient,
+                  borderColor: '#f72585',
+                  borderWidth: 1,
+                  borderRadius: 8
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: { 
+                  y: { 
+                      beginAtZero: true,
+                      grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                      }
+                  },
+                  x: {
+                      grid: {
+                          display: false
+                      }
+                  }
+              },
+              plugins: { 
+                  legend: { display: false },
+                  tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      titleFont: {
+                          size: 14
+                      },
+                      bodyFont: {
+                          size: 13
+                      },
+                      padding: 15,
+                      cornerRadius: 8
+                  }
+              }
+          }
+      });
+
+      // Best-Selling Categories Chart
+      var bestSellingCategoriesCtx = document.getElementById('bestSellingCategoriesChart').getContext('2d');
+      var categoriesGradient = bestSellingCategoriesCtx.createLinearGradient(0, 0, 0, 300);
+      categoriesGradient.addColorStop(0, 'rgba(76, 201, 240, 0.8)');
+      categoriesGradient.addColorStop(1, 'rgba(76, 201, 240, 0.2)');
+      
+      var bestSellingCategoriesChart = new Chart(bestSellingCategoriesCtx, {
+          type: 'bar',
+          data: {
+              labels: categoryLabels,
+              datasets: [{
+                  label: 'Total Sales',
+                  data: categoryData,
+                  backgroundColor: categoriesGradient,
+                  borderColor: '#4cc9f0',
+                  borderWidth: 1,
+                  borderRadius: 8
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: { 
+                  y: { 
+                      beginAtZero: true,
+                      grid: {
+                          color: 'rgba(0, 0, 0, 0.05)'
+                      }
+                  },
+                  x: {
+                      grid: {
+                          display: false
+                      }
+                  }
+              },
+              plugins: { 
+                  legend: { display: false },
+                  tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                      titleFont: {
+                          size: 14
+                      },
+                      bodyFont: {
+                          size: 13
+                      },
+                      padding: 15,
+                      cornerRadius: 8
+                  }
+              }
+          }
+      });
+  });
+</script>
+
+<!-- Add Font Awesome and Google Fonts -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}

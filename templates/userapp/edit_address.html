@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded" style="max-width: 600px; margin: auto;">
+        <h2 class="text-center mb-4">Edit Address</h2>
+
+        <form method="post" id="edit-address-form">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
+                {{ form.full_name }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.phone.id_for_label }}" class="form-label">Phone Number</label>
+                {{ form.phone }}
+                <small id="phone-error" class="text-danger"></small>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.street_address.id_for_label }}" class="form-label">Street Address</label>
+                {{ form.street_address }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                {{ form.city }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.state.id_for_label }}" class="form-label">State</label>
+                {{ form.state }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
+                {{ form.postal_code }}
+                <small id="postal-error" class="text-danger"></small>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
+                {{ form.country }}
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form.is_default }}
+                <label class="form-check-label" for="{{ form.is_default.id_for_label }}">Set as Default</label>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3">
+                <button type="submit" class="btn btn-success px-4">Update Address</button>
+                <a href="{% url 'profile_view' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Custom Styling */
+    input, textarea, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #28a745;
+        box-shadow: 0px 0px 5px #28a745;
+    }
+
+    /* Adjust button width */
+    .btn {
+        min-width: 150px;
+    }
+
+    /* Error Message Styling */
+    .text-danger {
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("edit-address-form");
+        const phoneInput = document.getElementById("{{ form.phone.id_for_label }}");
+        const postalCodeInput = document.getElementById("{{ form.postal_code.id_for_label }}");
+
+        const phoneError = document.getElementById("phone-error");
+        const postalError = document.getElementById("postal-error");
+
+        form.addEventListener("submit", function (event) {
+            let isValid = true;
+
+            // Validate Phone Number (Only Numbers)
+            if (!/^\d+$/.test(phoneInput.value)) {
+                phoneError.textContent = "Phone number must contain only digits.";
+                isValid = false;
+            } else {
+                phoneError.textContent = "";
+            }
+
+            // Validate Postal Code (Exactly 6 Digits)
+            if (!/^\d{6}$/.test(postalCodeInput.value)) {
+                postalError.textContent = "Postal code must be exactly 6 digits.";
+                isValid = false;
+            } else {
+                postalError.textContent = "";
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

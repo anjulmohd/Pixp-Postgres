@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- ✅ Display Flash Messages -->
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- ✅ Stylish OTP Container -->
+<div class="otp-container">
+    <h3 class="section__title">🔒 Enter OTP to Verify</h3>
+
+    <form method="POST" action="{% url 'verify_otp' %}" class="otp-form">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ user.id }}" />
+
+        <div class="otp-input-container">
+            <input type="text" name="otp" placeholder="Enter OTP" class="otp-input" required />
+        </div>
+
+        <button type="submit" class=" verify-btn btn-sm">✅ Verify OTP</button>
+    </form>
+
+    <!-- ⏳ OTP Timer -->
+    <div class="otp-timer">
+        <p>OTP expires in <span id="timer" class="countdown"></span></p>
+        
+        <form method="POST" action="{% url 'resend_otp' %}">
+            {% csrf_token %}
+            <input type="hidden" name="username" value="{{ user.username }}">
+            <button type="submit" class=" resend-btn text-center" id="resend-otp-btn" disabled>🔄 Resend OTP</button>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ Stylish JavaScript Countdown Timer -->
+<script>
+    var otpExpirationTime = 30; // 30 seconds timer
+    
+    function startOtpTimer() {
+        var timerElement = document.getElementById('timer');
+        var resendButton = document.getElementById('resend-otp-btn');
+
+        var countdown = setInterval(function() {
+            if (otpExpirationTime <= 0) {
+                clearInterval(countdown);
+                timerElement.innerHTML = "<span style='color: red;'>⏳ OTP Expired</span>";
+                resendButton.disabled = false;  
+                resendButton.classList.add('resend-active'); // Enable resend styling
+            } else {
+                timerElement.innerHTML = otpExpirationTime + " seconds";
+                otpExpirationTime--;
+            }
+        }, 1000);
+    }
+
+    window.onload = function() {
+        startOtpTimer();
+    };
+</script>
+
+<!-- ✅ Modern Styling -->
+<style>
+    /* 🌟 General Styles */
+   /* 🌟 General Styles */
+.otp-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    text-align: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ✨ Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section__title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* 🔢 OTP Input Field */
+.otp-input-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.otp-input {
+    width: 100%;
+    max-width: 280px;
+    font-size: 20px;
+    text-align: center;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.otp-input:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.5);
+}
+
+/* ✅ Buttons */
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    max-width: 250px;
+    text-align: center;
+}
+
+.verify-btn {
+    background: #28a745;
+    color: white;
+}
+
+.verify-btn:hover {
+    background: #218838;
+}
+
+/* 🔄 Resend OTP Button */
+.resend-btn {
+    background: #6c757d;
+    color: white;
+    margin-top: 12px;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.resend-active {
+    background: #007bff !important;
+    cursor: pointer !important;
+    opacity: 1;
+}
+
+/* ⏳ OTP Timer */
+.otp-timer {
+    margin-top: 15px;
+    font-size: 15px;
+    color: #555;
+}
+
+.countdown {
+    font-weight: bold;
+    color: #d9534f;
+}
+
+/* 📱 Responsive Fixes */
+@media (max-width: 480px) {
+    .otp-container {
+        padding: 20px;
+    }
+
+    .otp-input {
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+}
+
+</style>
+
+{% endblock content %}

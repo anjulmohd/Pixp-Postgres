@@ -1,0 +1,126 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<!--=============== BREADCRUMB ===============-->
+<main class="main">
+    <section class="breadcrumb">
+        <ul class="breadcrumb__list flex container">
+          <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+      <li><a href="{% url 'product_list' %}" class="breadcrumb__link">Manage Products</a></li>
+        </ul>
+        {% include 'admin/admin-search.html'%}
+      </section>
+      
+      <p class=" container total__products">We found <span>{{ page_obj.paginator.count }}</span> items for you!</p>
+    {% include 'admin/admin-sort.html' %}
+
+    <!--=============== PRODUCTS ===============-->
+    <section class="products container section--lg">
+
+
+
+        <!-- ADD FORM -->
+
+        
+
+
+
+
+      
+      <!--=============== PAGINATION ===============-->
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li><a href="?page=1" class="pagination__link">First</a></li>
+          <li><a href="?page={{ page_obj.previous_page_number }}" class="pagination__link"><i class="fi-rs-angle-left"></i></a></li>
+        {% else %}
+          <li class="disabled"><span class="pagination__link">First</span></li>
+          <li class="disabled"><span class="pagination__link"><i class="fi-rs-angle-left"></i></span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li><span class="pagination__link active">{{ num }}</span></li>
+          {% else %}
+            <li><a href="?page={{ num }}" class="pagination__link">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li><a href="?page={{ page_obj.next_page_number }}" class="pagination__link"><i class="fi-rs-angle-right"></i></a></li>
+          <li><a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__link">Last</a></li>
+        {% else %}
+          <li class="disabled"><span class="pagination__link"><i class="fi-rs-angle-right"></i></span></li>
+          <li class="disabled"><span class="pagination__link">Last</span></li>
+        {% endif %}
+      </ul>
+
+        
+        <div class="products__container grid">
+          {% for product in page_obj %}
+          <div class="product__item">
+            <div class="product__banner">
+              <a href="{% url 'editproduct' product.id %}" class="product__images">
+                <img
+                  src="{{ product.image.url }}"
+                  alt=""
+                  class="product__img default"
+                />
+                <img
+                  src="{{ product.image.url }}"
+                  alt=""
+                  class="product__img hover"
+                />
+              </a>
+              <div class="product__actions">
+                <a href="{% url 'editproduct' product.id %}" class="action__btn" aria-label="Edit Product">
+                  <i class="fi fi-rs-eye"></i>
+                </a>
+                <!-- Form (Hidden but will be submitted when the button is clicked) -->
+                <a href="#" class="action__btn" aria-label="Delete Product"
+                  onclick="event.preventDefault(); document.getElementById('deleteProductForm{{ product.id }}').submit();">
+                  <i class="fi fi-rs-heart"></i>
+                </a>
+                <form id="deleteProductForm{{ product.id }}" method="post" action="{% url 'delete_product' product.id %}" style="display: none;">
+                  {% csrf_token %}
+                </form>
+                
+                <!-- Add Variant Button -->
+                <a href="{% url 'add_product_variant' product.id %}" class="action__btn" aria-label="Add Variant">
+                  <i class="fi fi-rs-plus"></i>
+                </a>
+              </div>
+            </div>
+            <div class="product__content">
+              <span class="product__category">{{ product.category.name }}</span>
+              <a href="{% url 'editproduct' product.id %}">
+                <h3 class="product__title">{{ product.name }} </h3>
+              </a>
+              <div class="product__rating">
+                {% for i in "12345" %}
+                {% if forloop.counter <= product.rating %}
+                    &#9733;  <!-- Filled star -->
+                {% else %}
+                    &#9734;  <!-- Empty star -->
+                {% endif %}
+            {% endfor %}
+
+
+              </div>
+              <div class="product__price flex">
+                <span class="new__price">₹{{ product.price }}</span>
+
+            
+
+                <!-- <span class="old__price">$245.8</span> -->
+              </div>
+              
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sales Report</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 2cm;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            color: #333333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            margin-bottom: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24pt;
+            color: #2c3e50;
+        }
+        .date-range {
+            font-size: 12pt;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .timestamp {
+            font-size: 9pt;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        .summary-cards {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            width: 23%;
+            margin: 0 1% 20px 1%;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .card-title {
+            margin: 0;
+            font-size: 10pt;
+            color: #7f8c8d;
+        }
+        .card-value {
+            margin: 5px 0 0 0;
+            font-size: 18pt;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ecf0f1;
+        }
+        h2 {
+            margin: 0 0 15px 0;
+            font-size: 16pt;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #f8f9fa;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .status-table {
+            width: 48%;
+            float: left;
+            margin-right: 2%;
+        }
+        .products-table {
+            width: 48%;
+            float: right;
+        }
+        .clearfix {
+            clear: both;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9pt;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sales Performance Report</h1>
+        <div class="date-range">{{ start_date|date:"F d, Y" }} - {{ end_date|date:"F d, Y" }}</div>
+        <div class="timestamp">Generated on: {{ report_generated|date:"F d, Y H:i:s" }}</div>
+    </div>
+    
+    <div class="summary-cards">
+        <div class="summary-card">
+            <p class="card-title">Total Revenue</p>
+            <p class="card-value">${{ total_revenue|floatformat:2 }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="card-title">Total Orders</p>
+            <p class="card-value">{{ total_orders }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="card-title">Average Order Value</p>
+            <p class="card-value">${{ avg_order_value|floatformat:2 }}</p>
+        </div>
+        <div class="summary-card">
+            <p class="card-title">Delivered Orders</p>
+            <p class="card-value">{{ delivered_ratio|floatformat:1 }}%</p>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Order Status Distribution</h2>
+        <table class="status-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Orders</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in status_distribution %}
+                <tr>
+                    <td>{{ item.status_display }}</td>
+                    <td>{{ item.count }}</td>
+                    <td>{{ item.percentage|floatformat:1 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Top Products</th>
+                    <th>Quantity</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in top_products %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.total_quantity }}</td>
+                    <td>${{ item.total_revenue|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="clearfix"></div>
+    </div>
+    
+    <div class="section">
+        <h2>Daily Revenue Breakdown</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in daily_revenue %}
+                <tr>
+                    <td>{{ item.date|date:"M d, Y" }}</td>
+                    <td>${{ item.revenue|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <p>This report is automatically generated based on data from your ordering system.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+        <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><a href="{% url 'product_list' %}" class="breadcrumb__link">Manage Products</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><a href="{% url 'edit_product_variant' variant.product.id %}" class="breadcrumb__link">Edit Product</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><span class="breadcrumb__link">Edit Variant</span></li>
+    </ul>
+</section>
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Edit Variant: {{ variant.name }}</h2>
+
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Update Variant</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        transition: 0.3s;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    .card {
+        border-radius: 12px;
+        max-width: 800px;
+        margin: auto;
+    }
+</style>
+
+{% endblock %}

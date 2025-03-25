@@ -1,0 +1,619 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!--=============== HERO SECTION ===============-->
+<div class="shop-hero">
+  <div class="container">
+    <h1 class="shop-hero__title">Our Collection</h1>
+    <section class="breadcrumb">
+      <ul class="breadcrumb__list flex">
+        <li><a href="{% url 'home' %}" class="breadcrumb__link">Home</a></li>
+        <li><span class="breadcrumb__separator">›</span></li>
+        <li><span class="breadcrumb__current">Shop</span></li>
+      </ul>
+    </section>
+    
+    <!-- Stylish Filter Toggle Button -->
+    <div class="filter-toggle-container">
+      <button id="filterToggleBtn" class="filter-toggle-btn">
+        <span class="filter-toggle-text">Filter Products</span>
+        <span class="filter-toggle-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+{% include 'sortandfilter.html'%}
+
+<main class="main">
+  <div class="container">
+    <div class="products-header">
+      <p class="products-count">We found <span class="products-count__highlight">{{ page_obj.paginator.count }}</span> items for you!</p>
+     
+    </div>
+
+    <!--=============== PRODUCTS ===============-->
+    <section class="products section--lg">
+      <div class="products__container">
+        {% for product in page_obj %}
+        <div class="product-card">
+          <div class="product-card__badge">
+            {% if product.is_new %}
+            <span class="badge badge--new">New</span>
+            {% endif %}
+            {% if product.discount > 0 %}
+            <span class="badge badge--sale">-{{ product.discount }}%</span>
+            {% endif %}
+          </div>
+          
+          <div class="product-card__image">
+            <a href="{% url 'product' product.id %}">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img default" />
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img hover" />
+            </a>
+            
+            <div class="product-card__actions">
+              
+              
+              <button class="action-btn action-btn--quickview" aria-label="Quick View" 
+              onclick="location.href = `{% url 'product' product.id %}`;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 12c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3 3 1.346 3 3z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M12 19c-4.97 0-9-4.03-9-7s4.03-7 9-7 9 4.03 9 7-4.03 7-9 7z" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+              </button>
+              
+              <button class="action-btn action-btn--cart" aria-label="Add to Cart" 
+              onclick="location.href = `{% url 'add_to_cart' product.id %}`;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M8.5 13.5h7.45c.62 0 1.15-.38 1.38-.96l2.77-7.27c.2-.52.03-1.1-.43-1.44-.23-.17-.5-.27-.77-.27H5.5" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M3 3h2l2.1 11.4c.09.47.5.81.98.81H16" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="product-card__content">
+            <span class="product-card__category">{{ product.category.name }}</span>
+            <a href="{% url 'product' product.id %}" class="product-card__title-link">
+              <h3 class="product-card__title">{{ product.name }}</h3>
+            </a>
+            
+            <div class="product-card__rating">
+              {% for i in "12345" %}
+                {% if forloop.counter <= product.rating %}
+                  <span class="star star--filled">★</span>
+                {% else %}
+                  <span class="star">☆</span>
+                {% endif %}
+              {% endfor %}
+              {% if product.review_count %}
+                <span class="review-count">({{ product.review_count }})</span>
+              {% endif %}
+            </div>
+            
+            <div class="product-card__price">
+              <span class="price price--current">₹{{ product.price }}</span>
+              {% if product.old_price %}
+                <span class="price price--old">₹{{ product.old_price }}</span>
+              {% endif %}
+            </div>
+            
+            <button class="product-card__add-to-cart" onclick="location.href = `{% url 'add_to_cart' product.id %}`;">
+              Add to Cart
+          </button>
+          
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!--=============== PAGINATION ===============-->
+      <div class="pagination-container">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="pagination__item">
+              <a href="?page=1" class="pagination__link pagination__link--text">First</a>
+            </li>
+            <li class="pagination__item">
+              <a href="?page={{ page_obj.previous_page_number }}" class="pagination__link pagination__link--icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </li>
+          {% else %}
+            <li class="pagination__item pagination__item--disabled">
+              <span class="pagination__link pagination__link--text">First</span>
+            </li>
+            <li class="pagination__item pagination__item--disabled">
+              <span class="pagination__link pagination__link--icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="pagination__item pagination__item--active">
+                <span class="pagination__link">{{ num }}</span>
+              </li>
+            {% else %}
+              <li class="pagination__item">
+                <a href="?page={{ num }}" class="pagination__link">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="pagination__item">
+              <a href="?page={{ page_obj.next_page_number }}" class="pagination__link pagination__link--icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </li>
+            <li class="pagination__item">
+              <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__link pagination__link--text">Last</a>
+            </li>
+          {% else %}
+            <li class="pagination__item pagination__item--disabled">
+              <span class="pagination__link pagination__link--icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </li>
+            <li class="pagination__item pagination__item--disabled">
+              <span class="pagination__link pagination__link--text">Last</span>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>
+
+<style>
+  /* Shop Hero Section */
+  .shop-hero {
+    background-color: var(--container-color);
+    padding: 4rem 0 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .shop-hero__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+ 
+  .breadcrumb__list {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .breadcrumb__link {
+    color: #777;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  .breadcrumb__link:hover {
+    color: #000;
+  }
+  
+  .breadcrumb__separator {
+    color: #aaa;
+    font-size: 1rem;
+  }
+  
+  .breadcrumb__current {
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  /* Products Header */
+  .products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .products-count {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .products-count__highlight {
+    font-weight: 700;
+    color: #000;
+  }
+  
+  /* Products Container */
+  .products__container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+  
+  /* Product Card */
+  .product-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Product Badge */
+  .product-card__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .badge--new {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .badge--sale {
+    background-color: #FF5722;
+    color: white;
+  }
+  
+  /* Product Image */
+  .product-card__image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  
+  .product-img.hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  
+  .product-card:hover .product-img.default {
+    transform: scale(1.05);
+  }
+  
+  .product-card:hover .product-img.hover {
+    opacity: 1;
+  }
+  
+  /* Product Actions */
+  .product-card__actions {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  
+  .product-card:hover .product-card__actions {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-10px);
+  }
+  
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+    color: #555;
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  .action-btn:hover {
+    background: #000;
+    color: white;
+  }
+  
+  /* Product Content */
+  .product-card__content {
+    padding: 1.5rem;
+  }
+  
+  .product-card__category {
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .product-card__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: #333;
+    line-height: 1.4;
+    transition: color 0.3s;
+  }
+  
+  .product-card__title-link {
+    text-decoration: none;
+  }
+  
+  .product-card__title-link:hover .product-card__title {
+    color: #4169E1;
+  }
+  
+  /* Rating */
+  .product-card__rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    color: #FFB900;
+    font-size: 1rem;
+  }
+  
+  .review-count {
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+  }
+  
+  /* Price */
+  .product-card__price {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .price--current {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .price--old {
+    font-size: 0.9rem;
+    color: #999;
+    text-decoration: line-through;
+  }
+  
+  /* Add to Cart Button */
+  .product-card__add-to-cart {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #4169E1;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .product-card__add-to-cart:hover {
+    background-color: #2A4BBF;
+  }
+  
+  /* Pagination */
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+  }
+  
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    list-style: none;
+  }
+  
+  .pagination__item {
+    margin: 0 2px;
+  }
+  
+  .pagination__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.8rem;
+    border-radius: 8px;
+    background: white;
+    color: #555;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 1px solid #eee;
+  }
+  
+  .pagination__link:hover {
+    background: #f7f7f7;
+    color: #333;
+  }
+  
+  .pagination__item--active .pagination__link {
+    background: #4169E1;
+    color: white;
+    border-color: #4169E1;
+  }
+  
+  .pagination__item--disabled .pagination__link {
+    color: #ccc;
+    pointer-events: none;
+    border-color: #f5f5f5;
+  }
+  
+  .pagination__link--icon {
+    padding: 0;
+    min-width: 35px;
+    height: 35px;
+  }
+  
+  @media (max-width: 768px) {
+    .products__container {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .shop-hero__title {
+      font-size: 2rem;
+    }
+    
+    .products-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .pagination__link--text {
+      display: none;
+    }
+  }
+  .filter-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  
+  .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #f8f9fa;
+    color: #212529;
+    border: 2px solid #dee2e6;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .filter-toggle-btn:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .filter-toggle-btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+  }
+  
+  .filter-form-section {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    max-width: 900px;
+    opacity: 0;
+    padding: 0;
+  }
+  
+  .filter-form-section.show {
+    max-height: 500px;
+    opacity: 1;
+    padding: 20px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+</style>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterToggleBtn = document.getElementById('filterToggleBtn');
+    const filterFormSection = document.getElementById('filterFormSection');
+    
+    filterToggleBtn.addEventListener('click', function() {
+      this.classList.toggle('active');
+      
+      // Toggle form visibility with animation
+      if (filterFormSection.style.display === 'none' || !filterFormSection.style.display) {
+        filterFormSection.style.display = 'block';
+        setTimeout(() => {
+          filterFormSection.classList.add('show');
+        }, 10);
+        
+        // Change button text when expanded
+        document.querySelector('.filter-toggle-text').textContent = 'Hide Filters';
+      } else {
+        filterFormSection.classList.remove('show');
+        
+        // Wait for animation to complete before hiding
+        setTimeout(() => {
+          filterFormSection.style.display = 'none';
+        }, 500);
+        
+        // Change button text when collapsed
+        document.querySelector('.filter-toggle-text').textContent = 'Filter Products';
+      }
+    });
+  });
+</script>
+{% endblock %}

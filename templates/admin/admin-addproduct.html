@@ -1,0 +1,112 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+        <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><a href="#" class="breadcrumb__link">Add Products</a></li>
+    </ul>
+</section>
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Add a New Product</h2>
+
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_name" class="form-label">Product Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="id_price" class="form-label">Price</label>
+                    {{ form.price_initial }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="id_category" class="form-label">Category</label>
+                    {{ form.category }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="id_image" class="form-label">Product Image</label>
+                    {{ form.image }}
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="id_description" class="form-label">Base Product Detail</label>
+                    {{ form.base_product_detail }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="id_sale_price" class="form-label">Sale Price</label>
+                    {{ form.sale_price }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="id_date" class="form-label">Date</label>
+                    {{ form.date }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="id_rating" class="form-label">Rating</label>
+                    {{ form.rating }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 form-check">
+                    {{ form.is_popular }} 
+                    <label for="id_is_popular" class="form-check-label">Popular</label>
+                </div>
+
+                <div class="col-md-4 form-check">
+                    {{ form.is_featured }} 
+                    <label for="id_is_featured" class="form-check-label">Featured</label>
+                </div>
+
+                <div class="col-md-4 form-check">
+                    {{ form.is_sale }} 
+                    <label for="id_is_sale" class="form-check-label">On Sale</label>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Add Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        transition: 0.3s;
+    }
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .card {
+        border-radius: 12px;
+        max-width: 800px;
+        margin: auto;
+    }
+</style>
+
+{% endblock %}

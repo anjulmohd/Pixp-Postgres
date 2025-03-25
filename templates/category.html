@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="products container section--lg">
+    <h3 class="section__title"><span>Category : </span>{{category.name}}</h3>
+    
+<div class="products__container grid">
+    
+    {% for product in products %}
+    <div class="product__item">
+      <div class="product__banner">
+    
+        <a href="{% url 'product' product.id %}" class="product__images">
+          <img
+            src="{{ product.image.url }}"
+            alt=""
+            class="product__img default"
+          />
+          <img
+            src="{{ product.image.url }}"
+            alt=""
+            class="product__img hover"
+          />
+        </a>
+        <div class="product__actions">
+          <a href="#" class="action__btn" aria-label="Quick View">
+            <i class="fi fi-rs-eye"></i>
+          </a>
+          <a href="#" class="action__btn" aria-label="Add to Wishlist">
+            <i class="fi fi-rs-heart"></i>
+          </a>
+          <a href="#" class="action__btn" aria-label="Compare">
+            <i class="fi fi-rs-shuffle"></i>
+          </a>
+        </div>
+      </div>
+      <div class="product__content">
+        <!-- Link to the category page -->
+        <a href="{% url 'category' pk=product.category.id %}" class="product__category">{{ product.category.name }}</a>
+        <a href="{% url 'product' product.id %}">
+          <h3 class="product__title">{{ product.name }}</h3>
+        </a>
+        <div class="product__rating">
+          {% for i in "12345" %}
+            {% if forloop.counter <= product.rating %}
+                &#9733;  <!-- Filled star -->
+            {% else %}
+                &#9734;  <!-- Empty star -->
+            {% endif %}
+          {% endfor %}
+        </div>
+        <div class="product__price flex">
+          <span class="new__price">₹{{ product.price }}</span>
+        </div>
+        <a href="#" class="action__btn cart__btn" aria-label="Add To Cart">
+          <i class="fi fi-rs-shopping-bag-add"></i>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+</section>
+{% endblock content %}

@@ -1,0 +1,57 @@
+{% extends "admin/admin-base.html" %}
+
+{% block content %}
+<style>
+    /* Override default styles */
+    .custom-container {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+
+    .custom-btn {
+        background: linear-gradient(to right, #16a34a, #22c55e);
+        color: black;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: opacity 0.3s;
+    }
+
+    .custom-btn:hover {
+        opacity: 0.8;
+    }
+
+    /* Ensure black text everywhere */
+   
+</style>
+
+<div class="flex justify-center items-center min-h-screen bg-gray-100">
+    <div class="custom-container">
+        <h1 class="text-3xl font-bold mb-6">{{ title }}</h1>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="space-y-3">
+                {{ form.as_p }}
+            </div>
+
+            <button type="submit" class="custom-btn w-full">
+                💾 Save Coupon
+            </button>
+        </form>
+
+        <div class="mt-4">
+            <a href="{% url 'coupon_list' %}" class="font-semibold text-lg hover:underline transition">
+                ← Back to Coupons
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<main class="main">
+    <section class="breadcrumb">
+        <ul class="breadcrumb__list flex container">
+            <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+            <li><span class="breadcrumb__link">></span></li>
+            <li><a href="{% url 'product_list' %}" class="breadcrumb__link">Manage Products</a></li>
+            <li><span class="breadcrumb__link">></span></li>
+            <li><span class="breadcrumb__link">Add Variant</span></li>
+        </ul>
+    </section>
+
+    <section class="container section--lg">
+        <h2>Add Variant to {{ product.name }}</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Variant</button>
+        </form>
+    </section>
+</main>
+{% endblock %}

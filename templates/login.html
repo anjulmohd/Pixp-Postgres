@@ -1,0 +1,655 @@
+{% extends 'base.html' %}
+
+{% load socialaccount %}
+
+{% block content %}
+
+{% load static %}
+
+<main class="main">
+    <!--=============== BREADCRUMB ===============-->
+    <section class="breadcrumb">
+        <ul class="breadcrumb__list flex container">
+            <li><a href="{% url 'home' %}" class="breadcrumb__link">Home</a></li>
+            <li><span class="breadcrumb__link">></span></li>
+            <li><span class="breadcrumb__link">Login / Register</span></li>
+        </ul>
+    </section>
+
+    <!-- Displaying messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} fade-in">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!--=============== LOGIN-REGISTER ===============-->
+    <section class="login-register section--lg">
+        <div class="login-register__container container">
+            {% if user.is_active %}
+            <div class="auth-card logged-in-card">
+                <div class="auth-card__content">
+                    <h3 class="section__title">You are already logged in as</h3>
+                    <h1 class="user-name"><strong>{{ user.username | capfirst }}</strong></h1>
+                    <a href="{% url 'logout' %}" class="btn btn--primary">Logout</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="auth-tabs">
+                <div class="auth-tabs__header">
+                    <button class="auth-tabs__btn active" data-target="login">Login</button>
+                    <button class="auth-tabs__btn" data-target="register">Register</button>
+                </div>
+                
+                <div class="auth-tabs__content">
+                    <!-- Login Form -->
+                    <div id="login" class="auth-form active">
+                        <form method="POST" action="{% url 'login' %}" class="form grid">
+                            {% csrf_token %}
+                            
+                            <div class="form__group">
+                                <label for="login-identifier" class="form__label">Username or Email</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-user"></i>
+                                    <input type="text" id="login-identifier" name="identifier" placeholder="Enter your username or email" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group">
+                                <label for="login-password" class="form__label">Password</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-lock"></i>
+                                    <input type="password" id="login-password" name="password" placeholder="Enter your password" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group form__group--checkbox">
+                                <input type="checkbox" id="remember-me" class="form__checkbox" />
+                                <label for="remember-me" class="form__checkbox-label">Remember me</label>
+                                <a href="{% url 'request_reset_otp' %}" class="form__forgot-link">Forgot password?</a>
+                            </div>
+                            
+                            
+                            <button type="submit" class="btn btn--primary btn--full">Login</button>
+                            
+                            <div class="form__divider">
+                                <span>or</span>
+                            </div>
+                        
+                            <a href="{% provider_login_url 'google' process='login' %}" class="google-btn">
+                                <img src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-1024.png" alt="Google Logo">
+                                Sign in with Google
+                            </a>
+                        </form>
+                        
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <div id="register" class="auth-form">
+                        <form method="POST" action="{% url 'register' %}" class="form grid">
+                            {% csrf_token %}
+                            <div class="form__group">
+                                <label for="register-username" class="form__label">Username</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-user"></i>
+                                    <input type="text" id="register-username" name="username" placeholder="Choose a username" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group">
+                                <label for="register-email" class="form__label">Email</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-envelope"></i>
+                                    <input type="email" id="register-email" name="email" placeholder="Enter your email" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group">
+                                <label for="register-password" class="form__label">Password</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-lock"></i>
+                                    <input type="password" id="register-password" name="password" placeholder="Create a password" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group">
+                                <label for="register-confirm-password" class="form__label">Confirm Password</label>
+                                <div class="form__input-group">
+                                    <i class="form__icon fas fa-lock"></i>
+                                    <input type="password" id="register-confirm-password" name="confirm_password" placeholder="Confirm your password" class="form__input" required />
+                                </div>
+                            </div>
+                            
+                            <div class="form__group form__group--checkbox">
+                                <input type="checkbox" id="terms" class="form__checkbox" required />
+                                <label for="terms" class="form__checkbox-label">I agree to the <a href="#" class="form__link">Terms & Conditions</a></label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn--primary btn--full">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!--=============== NEWSLETTER ===============-->
+    <section class="newsletter section">
+        <div class="newsletter__container container">
+            <div class="newsletter__content">
+                <h3 class="newsletter__title">
+                    <img src="{% static 'img/icon-email.svg' %}" alt="" class="newsletter__icon" />
+                    Sign up for Newsletter
+                </h3>
+                <p class="newsletter__description">Subscribe and get $25 coupon for your first purchase</p>
+            </div>
+            <form action="" class="newsletter__form">
+                <div class="newsletter__input-group">
+                    <input type="email" placeholder="Enter your email" class="newsletter__input" required />
+                    <button type="submit" class="newsletter__btn">Subscribe</button>
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+
+<style>
+/* General Styles */
+:root {
+    --color-primary: #3a86ff;
+    --color-primary-light: #5a9aff;
+    --color-primary-dark: #2a76ef;
+    --color-secondary: #ff6b6b;
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-border: #e0e0e0;
+    --color-background: #ffffff;
+    --color-background-alt: #f8f9fa;
+    --border-radius: 8px;
+    --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+.section--lg {
+    padding: 80px 0;
+}
+
+
+
+/* Alert Messages */
+.messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 300px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    position: relative;
+    animation: fade-in 0.5s ease;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Login/Register Section */
+.login-register__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 550px;
+}
+
+/* Logged In Card */
+.logged-in-card {
+    background-color: var(--color-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.user-name {
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin: 20px 0 30px;
+}
+
+/* Auth Tabs */
+.auth-tabs {
+    background-color: var(--color-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+}
+
+.auth-tabs__header {
+    display: flex;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.auth-tabs__btn {
+    flex: 1;
+    padding: 20px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-tabs__btn.active {
+    color: var(--color-primary);
+    border-bottom: 3px solid var(--color-primary);
+}
+
+.auth-tabs__btn:hover:not(.active) {
+    background-color: var(--color-background-alt);
+}
+
+.auth-tabs__content {
+    padding: 30px;
+}
+
+/* Auth Forms */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+    animation: fade-in 0.5s ease;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form__group {
+    position: relative;
+}
+
+.form__label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.form__input-group {
+    position: relative;
+}
+
+.form__icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--color-text-light);
+}
+
+.form__input {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form__input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+    outline: none;
+}
+
+.form__input::placeholder {
+    color: #aaa;
+}
+
+.form__group--checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form__checkbox {
+    position: absolute;
+    opacity: 0;
+}
+
+.form__checkbox-label {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.form__checkbox-label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    transition: var(--transition);
+}
+
+.form__checkbox:checked + .form__checkbox-label:before {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.form__checkbox:checked + .form__checkbox-label:after {
+    content: '✓';
+    position: absolute;
+    left: 4px;
+    top: -1px;
+    color: white;
+    font-size: 14px;
+}
+
+.form__forgot-link {
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.form__forgot-link:hover {
+    text-decoration: underline;
+}
+
+.form__link {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.form__link:hover {
+    text-decoration: underline;
+}
+
+.form__divider {
+    position: relative;
+    text-align: center;
+    margin: 10px 0;
+}
+
+.form__divider:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+.form__divider span {
+    position: relative;
+    background-color: var(--color-background);
+    padding: 0 10px;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 6px 24px;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn--primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn--primary:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.btn--full {
+    width: 100%;
+}
+
+/* Google Sign-in Button */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: #757575;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    padding: 12px 15px;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    width: 100%;
+}
+
+.google-btn img {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.google-btn:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+/* Newsletter Section */
+.newsletter {
+    background-color: var(--color-background-alt);
+    padding: 50px 0;
+    margin-top: 60px;
+}
+
+.newsletter__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.newsletter__content {
+    flex: 1;
+}
+
+.newsletter__title {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-text);
+}
+
+.newsletter__icon {
+    width: 24px;
+    margin-right: 10px;
+}
+
+.newsletter__description {
+    color: var(--color-text-light);
+    font-size: 1rem;
+}
+
+.newsletter__form {
+    flex: 1;
+    max-width: 500px;
+}
+
+.newsletter__input-group {
+    display: flex;
+    position: relative;
+}
+
+.newsletter__input {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    font-size: 1rem;
+}
+
+.newsletter__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.newsletter__btn {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0 25px;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.newsletter__btn:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .login-register__container {
+        padding: 20px;
+    }
+    
+    .newsletter__container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .newsletter__form {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-tabs__content {
+        padding: 20px;
+    }
+    
+    .form__group--checkbox {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .form__forgot-link {
+        margin-left: 28px;
+    }
+    
+    .newsletter__input-group {
+        flex-direction: column;
+    }
+    
+    .newsletter__input {
+        border-radius: var(--border-radius);
+        margin-bottom: 10px;
+    }
+    
+    .newsletter__btn {
+        border-radius: var(--border-radius);
+        width: 100%;
+        padding: 12px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabButtons = document.querySelectorAll('.auth-tabs__btn');
+    const tabContents = document.querySelectorAll('.auth-form');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.target;
+            
+            // Update active tab
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show target content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === target) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // Auto-dismiss alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

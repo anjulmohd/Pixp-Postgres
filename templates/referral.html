@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Referral Code</h2>
+<p>Referral Code: <strong id="referral-code"></strong></p>
+<p>Referral Count: <strong id="referral-count"></strong></p>
+
+<!-- Show referral form only if user hasn't used a referral code -->
+<div id="apply-referral-section">
+    <h3>Apply a Referral Code</h3>
+    <form id="apply-referral-form" method="post" action="{% url 'apply_referral' %}">
+        {% csrf_token %}
+        <input type="text" name="referral_code" placeholder="Enter referral code" required />
+        <button type="submit">Apply</button>
+    </form>
+</div>
+
+<script>
+       // Fetch referral code and count
+       fetch("{% url 'show_referral' %}")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('referral-code').innerText = data.referral_code;
+            document.getElementById('referral-count').innerText = data.referral_count;
+
+            // Hide referral input if the user has already used a code
+            if (data.has_used_referral) {
+                document.getElementById('apply-referral-section').style.display = 'none';
+            }
+        });
+
+    // Handle referral code application
+    document.getElementById('apply-referral-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch("{% url 'apply_referral' %}", {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+
+            // Check if the referral was applied successfully
+            if (data.message === "Referral applied successfully!") {
+                // Hide the referral input after applying
+                document.getElementById('apply-referral-section').style.display = 'none';
+                
+                // Don't update A's referral count here since it's only B’s count that increases!
+                // We don't touch the referral count of the current user (A) after applying.
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+        <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+        <li><span class="breadcrumb__link"></span>></li>
+        <li><span class="breadcrumb__link">Shop</span></li>
+        <li><span class="breadcrumb__link"></span>></li>
+        <li><span class="breadcrumb__link">Wishlist</span></li>
+    </ul>
+</section>
+
+<!--=============== WISHLIST ===============-->
+<section class="wishlist section--lg container">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="table__container">
+        {% if wishlist.items.all %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock Status</th>
+                    <th>Action</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in wishlist.items.all %}
+                <tr>
+                    <td>
+                        <!-- Display image for product or variant -->
+                        {% if item.product %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="table__img" />
+                        {% elif item.product_variant %}
+                        <img src="{% if item.product_variant.image %}{{ item.product_variant.image.url }}{% else %}{{ item.product_variant.product.image.url }}{% endif %}" alt="{{ item.product_variant.name }}" class="table__img" />
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Display name for product or variant -->
+                        <h3 class="table__title">
+                            {% if item.product %}
+                            <a href="{% url 'product' item.product.id %}">
+                                {{ item.product.name }}
+                            </a>
+                            {% elif item.product_variant %}
+                            <a href="{% url 'product' item.product_variant.product.id %}?variant_id={{ item.product_variant.id }}">
+                                {{ item.product_variant.product.name }} - {{ item.product_variant.name }}
+                            </a>
+                            {% endif %}
+                        </h3>
+                        <p class="table__description">
+                            Category: 
+                            {% if item.product %}
+                            {{ item.product.category.name }}
+                            {% elif item.product_variant %}
+                            {{ item.product_variant.product.category.name }}
+                            {% endif %}
+                        </p>
+                    </td>
+                    <td>
+                        <!-- Display price for product or variant -->
+                        <span class="table__price">
+                            ₹{% if item.product %}{{ item.product.price }}{% elif item.product_variant %}{{ item.product_variant.price }}{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Display stock status for product or variant -->
+                        <span class="table__stock">
+                            {% if item.product %}
+                                {% if item.product.stock_quantity > 10 %}
+                                    In Stock
+                                {% elif item.product.stock_quantity > 0 %}
+                                    Low Stock ({{ item.product.stock_quantity }} left)
+                                {% else %}
+                                    Out of Stock
+                                {% endif %}
+                            {% elif item.product_variant %}
+                                {% if item.product_variant.stock_quantity > 10 %}
+                                    In Stock
+                                {% elif item.product_variant.stock_quantity > 0 %}
+                                    Low Stock ({{ item.product_variant.stock_quantity }} left)
+                                {% else %}
+                                    Out of Stock
+                                {% endif %}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Add to Cart button -->
+                        <a href="{% url 'list_to_cart' item.id %}" class="btn btn--sm">Add to Cart</a>
+                    </td>
+                    <td>
+                        <!-- Remove from Wishlist button -->
+                        <a href="{% url 'remove_from_wishlist' item.id %}">
+                          <i class="fi fi-rs-trash table__trash"></i>
+                      </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Your wishlist is empty.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,367 @@
+{%extends 'base.html'%}
+
+{% block content%}
+{% load static %}
+<!--=============== MAIN ===============-->
+<main class="main">
+  <!--=============== HOME ===============-->
+  <section class="home section--lg">
+    <div class="home__container container grid">
+      <div class="home__content">
+        <span class="home__subtitle">Hot Promotions</span>
+        <h1 class="home__title">
+          Trending Gadgets <span>Great Collection</span>
+        </h1>
+        <p class="home__description">
+          Save more with coupons & up tp 20% off
+        </p>
+        <a href="{% url 'shop' %}" class="btn">Shop Now</a>
+      </div>
+      <img src="{% static 'images/cover.jpeg'%}" class="home__img" alt="hats" />
+    </div>
+  </section>
+
+  <!--=============== CATEGORIES ===============-->
+  <section class="categories container section">
+    <h3 class="section__title"><span>Popular</span> Categories</h3>
+    <div class="categories__container swiper">
+      <div class="swiper-wrapper">
+        {% for cat in category %}
+        <a href="{% url 'category' pk=cat.pk %}" class="category__item swiper-slide">
+          <img
+            src="{{cat.image.url}}"
+            alt=""
+            class="category__img"
+          />
+          <h3 class="category__title">{{cat.name}}</h3>
+        </a>
+        {% endfor %}
+      </div>
+
+      <div class="swiper-button-prev">
+        <i class="fi fi-rs-angle-left"></i>
+      </div>
+      <div class="swiper-button-next">
+        <i class="fi fi-rs-angle-right"></i>
+      </div>
+    </div>
+  </section>
+
+  <!--=============== PRODUCTS ===============-->
+  <section class="products container section">
+    <div class="tab__btns">
+      <span class="tab__btn active-tab" data-target="#featured"
+        >Featured</span
+      >
+      <span class="tab__btn" data-target="#popular">Popular items</span>
+      <span class="tab__btn" data-target="#new-added">Newly Added</span>
+    </div>
+
+    <div class="tab__items">
+      <div class="tab__item active-tab" content id="featured">
+        <div class="products__container grid">
+
+
+          {%for product in product%}
+
+          {%if product.is_featured %}
+          <div class="product__item">
+            <div class="product__banner">
+              <a href="{% url 'product' product.id %}" class="product__images">
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img default"
+                />
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img hover"
+                />
+              </a>
+              <div class="product__actions">
+                <a href="#" class="action__btn" aria-label="Quick View">
+                  <i class="fi fi-rs-eye"></i>
+                </a>
+                <a
+                  href="#"
+                  class="action__btn"
+                  aria-label="Add to Wishlist"
+                >
+                  <i class="fi fi-rs-heart"></i>
+                </a>
+                <a href="#" class="action__btn" aria-label="Compare">
+                  <i class="fi fi-rs-shuffle"></i>
+                </a>
+              </div>
+            </div>
+            <div class="product__content">
+              <span class="product__category">{{product.category.name}}</span>
+              <a href="details.html">
+                <h3 class="product__title">{{product.name}}</h3>
+              </a>
+              <div class="product__rating">
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+              </div>
+              <div class="product__price flex">
+                <span class="new__price">₹{{product.price}}</span>
+                <!-- <span class="old__price">₹245.8</span> -->
+              </div>
+              <a
+                href="#"
+                class="action__btn cart__btn"
+                aria-label="Add To Cart"
+              >
+                <i class="fi fi-rs-shopping-bag-add"></i>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+          
+        </div>
+      </div>
+      <div class="tab__item" content id="popular">
+        <div class="products__container grid">
+          
+
+          {%for product in product%}
+
+          {%if product.is_popular %}
+          <div class="product__item">
+            <div class="product__banner">
+              <a href="{% url 'product' product.id %}" class="product__images">
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img default"
+                />
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img hover"
+                />
+              </a>
+              <div class="product__actions">
+                <a href="#" class="action__btn" aria-label="Quick View">
+                  <i class="fi fi-rs-eye"></i>
+                </a>
+                <a
+                  href="#"
+                  class="action__btn"
+                  aria-label="Add to Wishlist"
+                >
+                  <i class="fi fi-rs-heart"></i>
+                </a>
+                <a href="#" class="action__btn" aria-label="Compare">
+                  <i class="fi fi-rs-shuffle"></i>
+                </a>
+              </div>
+            </div>
+            <div class="product__content">
+              <span class="product__category">{{product.category.name}}</span>
+              <a href="details.html">
+                <h3 class="product__title">{{product.name}}</h3>
+              </a>
+              <div class="product__rating">
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+              </div>
+              <div class="product__price flex">
+                <span class="new__price">₹{{product.price}}</span>
+                <!-- <span class="old__price">₹245.8</span> -->
+              </div>
+              <a
+                href="#"
+                class="action__btn cart__btn"
+                aria-label="Add To Cart"
+              >
+                <i class="fi fi-rs-shopping-bag-add"></i>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="tab__item" content id="new-added">
+        <div class="products__container grid">
+          
+          {% for product in newproduct %}
+
+          <div class="product__item">
+            <div class="product__banner">
+              <a href="{% url 'product' product.id %}" class="product__images">
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img default"
+                />
+                <img
+                  src="{{product.image.url}}"
+                  alt=""
+                  class="product__img hover"
+                />
+              </a>
+              <div class="product__actions">
+                <a href="#" class="action__btn" aria-label="Quick View">
+                  <i class="fi fi-rs-eye"></i>
+                </a>
+                <a
+                  href="#"
+                  class="action__btn"
+                  aria-label="Add to Wishlist"
+                >
+                  <i class="fi fi-rs-heart"></i>
+                </a>
+                <a href="#" class="action__btn" aria-label="Compare">
+                  <i class="fi fi-rs-shuffle"></i>
+                </a>
+              </div>
+            </div>
+            <div class="product__content">
+              <span class="product__category">{{product.category.name}}</span>
+              <a href="details.html">
+                <h3 class="product__title">{{product.name}}</h3>
+              </a>
+              <div class="product__rating">
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+                <i class="fi fi-rs-star"></i>
+              </div>
+              <div class="product__price flex">
+                <span class="new__price">₹{{product.price}}</span>
+                <!-- <span class="old__price">₹245.8</span> -->
+              </div>
+              <a
+                href="#"
+                class="action__btn cart__btn"
+                aria-label="Add To Cart"
+              >
+                <i class="fi fi-rs-shopping-bag-add"></i>
+              </a>
+            </div>
+          </div>
+            {% endfor %}
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+    
+
+  <!--=============== NEW ARRIVALS ===============-->
+  <section class="new__arrivals container section">
+    <h3 class="section__title"><span>New</span> Arrivals</h3>
+    <div class="new__container swiper">
+      <div class="swiper-wrapper">
+
+          {% for product in newproduct %}
+        <div class="product__item swiper-slide">
+          <div class="product__banner">
+            <a href="{% url 'product' product.id %}" class="product__images">
+              <img
+                src="{{product.image.url}}"
+                alt=""
+                class="product__img default"
+              />
+              <img
+                src="{{product.image.url}}"
+                alt=""
+                class="product__img hover"
+              />
+            </a>
+            <div class="product__actions">
+              <a href="#" class="action__btn" aria-label="Quick View">
+                <i class="fi fi-rs-eye"></i>
+              </a>
+              <a href="#" class="action__btn" aria-label="Add to Wishlist">
+                <i class="fi fi-rs-heart"></i>
+              </a>
+              <a href="#" class="action__btn" aria-label="Compare">
+                <i class="fi fi-rs-shuffle"></i>
+              </a>
+            </div>
+            <div class="product__badge blue">Latest Deal</div>
+          </div>
+          <div class="product__content">
+            <span class="product__category">{{product.category.name}}</span>
+            <a href="details.html">
+              <h3 class="product__title">{{product.name}}</h3>
+            </a>
+            <div class="product__rating">
+              <i class="fi fi-rs-star"></i>
+              <i class="fi fi-rs-star"></i>
+              <i class="fi fi-rs-star"></i>
+              <i class="fi fi-rs-star"></i>
+              <i class="fi fi-rs-star"></i>
+            </div>
+            <div class="product__price flex">
+              <span class="new__price">₹{{product.price}}</span>
+              <!-- <span class="old__price">$245.8</span> -->
+            </div>
+            <a
+              href="#"
+              class="action__btn cart__btn"
+              aria-label="Add To Cart"
+            >             <i class="fi fi-rs-shopping-bag-add"></i>
+            </a>
+          </div>
+        </div>
+
+        
+
+        {% endfor %}
+
+      </div>
+
+      
+
+      <div class="swiper-button-prev">
+        <i class="fi fi-rs-angle-left"></i>
+      </div>
+      <div class="swiper-button-next">
+        <i class="fi fi-rs-angle-right"></i>
+      </div>
+    </div>
+  </section>
+
+  
+  <!--=============== NEWSLETTER ===============-->
+  <section class="newsletter section home__newsletter">
+    <div class="newsletter__container container grid">
+      <h3 class="newsletter__title flex">
+        <img
+          src="./assets/img/icon-email.svg"
+          alt=""
+          class="newsletter__icon"
+        />
+        Sign in to Newsletter
+      </h3>
+      <p class="newsletter__description">
+        ...and receive $25 coupon for first shopping.
+      </p>
+      <form action="" class="newsletter__form">
+        <input
+          type="text"
+          placeholder="Enter Your Email"
+          class="newsletter__input"
+        />
+        <button type="submit" class="newsletter__btn">Subscribe</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+{% endblock %}

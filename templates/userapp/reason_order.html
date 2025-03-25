@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>
+        {% if order.status == "DELIVERED" %}
+            Return Order #{{ order.id }}
+        {% else %}
+            Cancel Order #{{ order.id }}
+        {% endif %}
+    </h2>
+
+    <p>
+        {% if order.status == "DELIVERED" %}
+            Are you sure you want to return this order? Please provide a reason:
+        {% else %}
+            Are you sure you want to cancel this order? Please provide a reason:
+        {% endif %}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="reason">
+                {% if order.status == "DELIVERED" %}
+                    Return Reason:
+                {% else %}
+                    Cancellation Reason:
+                {% endif %}
+            </label>
+            <textarea name="reason" id="reason" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger">
+            {% if order.status == "DELIVERED" %}
+                Confirm Return
+            {% else %}
+                Confirm Cancellation
+            {% endif %}
+        </button>
+        <a href="{% url 'profile_view' %}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+{% endblock %}

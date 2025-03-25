@@ -1,0 +1,12 @@
+{% extends 'base.html'%}
+
+
+{% block content%}
+
+<a href="{% provider_login_url 'google' %}">
+    <button style="background-color: #4285F4; color: white; border: none; padding: 10px 15px;">
+        Sign in with Google
+        </button>
+</a>
+
+{% endblock content%}

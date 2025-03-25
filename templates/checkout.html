@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+<link href="{% static 'css/checkout.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+        <li><a href="index.html" class="breadcrumb__link">Home</a></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><span class="breadcrumb__link">Shop</span></li>
+        <li><span class="breadcrumb__link">></span></li>
+        <li><span class="breadcrumb__link">Checkout</span></li>
+    </ul>
+</section>
+
+<!-- Messages -->
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Checkout Section -->
+<section class="checkout section--lg">
+    <div class="checkout__container container grid">
+        <!-- Checkout Details -->
+        <div class="checkout__group">
+            <h3 class="section__title">Checkout Details</h3>
+            <h4 class="section__subtitle">Select Billing Address</h4>
+
+            <!-- Add Address Button -->
+            <a href="{% url 'add_address' %}" class="btn btn--md btn--primary">Add Address</a>
+
+            <!-- Address List -->
+            <form method="POST" class="address-form">
+                {% csrf_token %}
+                <div class="address-list">
+                    {% for address in addresses %}
+                        <div class="address-card {% if address.is_default %}default-address{% endif %}">
+                            <label class="address-label">
+                                <input type="radio" name="default_address" value="{{ address.id }}" {% if address.is_default %}checked{% endif %} class="address-radio">
+                                <div class="address-details">
+                                    <h5 class="address-name">{{ address.full_name }}</h5>
+                                    {% if address.phone %}
+                                        <p class="address-phone"><strong>Phone:</strong> {{ address.phone }}</p>
+                                    {% endif %}
+                                    <p class="address-location">
+                                        {{ address.street_address }}, {{ address.city }}
+                                        {% if address.state %}, {{ address.state }}{% endif %}
+                                        - {{ address.postal_code }}<br>
+                                        {{ address.country }}
+                                    </p>
+                                    {% if address.is_default %}
+                                        <span class="default-badge">Default Address</span>
+                                    {% endif %}
+                                </div>
+                            </label>
+                        </div>
+                    {% empty %}
+                        <p class="no-addresses">No addresses available. Please add an address to proceed.</p>
+                    {% endfor %}
+                </div>
+                <button type="submit" name="set_default_address" class="btn-set-default">Set as Default Address</button>
+            </form>
+        </div>
+
+        <!-- Cart Totals -->
+        <div class="checkout__group">
+            <h3 class="section__title">Cart Totals</h3>
+            <table class="order__table">
+        <thead>
+            <tr>
+                <th colspan="2">Products</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>
+                    <!-- Display product or variant image -->
+                    <img
+                        src="{% if item.product_variant and item.product_variant.image %}{{ item.product_variant.image.url }}{% else %}{{ item.product.image.url }}{% endif %}"
+                        alt=""
+                        class="order__img"
+                    />
+                </td>
+                <td>
+                    <!-- Display product or variant name -->
+                    <h3 class="table__title">
+                        {{ item.product.name }}
+                        {% if item.product_variant %}{{ item.product_variant.product.name }} - {{ item.product_variant.name }}{% endif %}
+                    </h3>
+                    <p class="table__quantity">{{ item.quantity }}</p>
+                </td>
+                <td>
+                    <!-- Display subtotal -->
+                    <span class="table__price">₹{{ item.subtotal }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+
+            <tr>
+                <td><span class="order__subtitle">Subtotal</span></td>
+                {% if cart.coupon %}
+                <td colspan="2"><span class="table__price">₹{{ cart.discounted_price }}</span></td>
+                {% else %}
+                <td colspan="2"><span class="table__price">₹{{ total_price }}</span></td>
+                {% endif %}
+            </tr>
+
+            <tr>
+                <td><span class="order__subtitle">Shipping</span></td>
+                <td colspan="2">
+                    <span class="table__price">Free Shipping</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td><span class="order__subtitle">Total</span></td>
+                <td colspan="2">
+                    {% if cart.coupon %}
+                    <span class="order__grand-total">₹{{ cart.discounted_price }}</span>
+                    {% else %}
+                    <span class="order__grand-total">₹{{ total_price }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+          
+
+        <!-- Third Checkout Group -->
+       
+
+<!-- Third Checkout Group -->
+ <!-- Payment Methods -->
+ <form id="paymentForm" method="POST">
+    {% csrf_token %}
+    <div class="checkout__group">
+        <h3 class="section__title">Payment Methods</h3>
+        <div class="payment__methods">
+            <div class="payment__option flex">
+                <input type="radio" name="payment_method" id="razorpay" checked class="payment__input" value="razorpay" />
+                <label for="razorpay" class="payment__label">Razorpay</label>
+            </div>
+            <div class="payment__option flex">
+                <input type="radio" name="payment_method" id="cod" class="payment__input" value="cod" />
+                <label for="cod" class="payment__label">Cash On Delivery</label>
+            </div>
+            <div class="payment__option flex">
+                <input type="radio" name="payment_method" id="paypal" class="payment__input" value="paypal" />
+                <label for="paypal" class="payment__label">PayPal</label>
+            </div>
+            <div class="payment__option flex">
+                <input type="radio" name="payment_method" id="wallet" class="payment__input" value="wallet" />
+                <label for="wallet" class="payment__label">Wallet Balance (₹{{ wallet_balance }})</label>
+            </div>
+        </div>
+
+        <!-- Button for placing an order -->
+        <button id="placeOrderBtn" class="btn btn--md text-white" type="button" {% if not has_default_address %}disabled{% endif %}>
+            Place Order
+        </button>
+    </div>
+</form>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById("placeOrderBtn").addEventListener("click", function (event) {
+    event.preventDefault();  // Prevent default form submission
+
+    let selectedPayment = document.querySelector('input[name="payment_method"]:checked').value;
+    let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    if (selectedPayment === "cod") {
+        // Handle Cash on Delivery
+        window.location.href = "{% url 'place_order' %}";  
+    } 
+    else if (selectedPayment === "razorpay") {
+        // Step 1: Create Order via Backend API
+        fetch("{% url 'place_paymentorder' %}", { 
+            method: "POST", 
+            headers: { 
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken  
+            },
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+                return;
+            }
+
+            // Step 2: Open Razorpay Payment Modal
+            var options = {
+                key: data.razorpay_key,  // Razorpay Key from Backend
+                amount: data.amount,  // Amount in paise
+                currency: data.currency,
+                order_id: data.razorpay_order_id,
+                name: "Demo Store",
+                description: "Order Payment",
+                prefill: {
+                    name: "{{ user.first_name }} {{ user.last_name }}",
+                    email: "{{ user.email }}"
+                },
+                theme: { color: "#F37254" },
+                callback_url: "{% url 'verify_payment' %}",  // Callback URL
+                handler: function (response) {
+                    // Step 3: Verify Payment via Backend
+                    fetch("{% url 'verify_payment' %}", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken  
+                        },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "Payment Successful") {
+                            alert("Payment Successful!");
+                            window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);  
+                        } else {
+                            alert("Payment Failed! Please try again.");
+                            window.location.href = "{% url 'order_failed' %}";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Verification Error:", error);
+                        alert("Payment verification failed!");
+                    });
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong!");
+        });
+    } 
+    else if (selectedPayment === "paypal") {
+        alert("PayPal integration coming soon!");
+    }
+    else if (selectedPayment === "wallet") {
+        // Handle Wallet Balance Payment
+        fetch("{% url 'place_order_wallet' %}", { 
+            method: "POST", 
+            headers: { 
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken  
+            },
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+                return;
+            }
+
+            if (data.status === "success") {
+                alert("Order placed successfully using wallet balance!");
+                window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);  
+            } else {
+                alert("Failed to place order using wallet balance.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong!");
+        });
+    }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+</section>
+
+
+
+
+  {% endblock content %}

@@ -1,0 +1,46 @@
+<div id="filterFormSection" class="filter-form-section" style="display: none;">
+    <div class="container" style="max-width: 800px; margin: auto;">
+      <form method="GET" action="{% url 'shop' %}" class="row g-3">
+        <!-- Category Selection -->
+        <div class="col-md-6">
+          <label for="category" class="form-label">Category:</label>
+          <select name="category" class="form-select">
+            <option value="all">All Categories</option>
+            {% for cat in category %}
+            <option value="{{ cat.id }}" {% if cat.id|slugify == selected_category|slugify %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+  
+        <!-- Min Price -->
+        <div class="col-md-3">
+          <label for="min_price" class="form-label">Min Price:</label>
+          <input type="number" name="min_price" id="min_price" value="{{ min_price }}" class="form-control" step="0.01">
+        </div>
+  
+        <!-- Max Price -->
+        <div class="col-md-3">
+          <label for="max_price" class="form-label">Max Price:</label>
+          <input type="number" name="max_price" id="max_price" value="{{ max_price }}" class="form-control" step="0.01">
+        </div>
+  
+        <!-- Sorting Options -->
+        <div class="col-md-6">
+          <label for="sort_by" class="form-label">Sort By:</label>
+          <select name="sort_by" id="sort_by" class="form-select">
+            <option value="price_asc" {% if sort_by == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if sort_by == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+            <option value="name_asc" {% if sort_by == "name_asc" %}selected{% endif %}>Name: A to Z</option>
+            <option value="name_desc" {% if sort_by == "name_desc" %}selected{% endif %}>Name: Z to A</option>
+          </select>
+        </div>
+  
+        <!-- Search Button -->
+        <div class="col-md-6 text-center">
+          <button type="submit" class="btn btn-primary mt-4 w-100">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -1,0 +1,46 @@
+{% load static %}
+<nav class="nav container">
+    <a href="{% url 'home'%}" class="nav__logo">
+      <h1> ADMIN PANEL </h1>
+    </a>
+    <div class="nav__menu" id="nav-menu">
+      <div class="nav__menu-top">
+        <a href="index.html" class="nav__menu-logo">
+          <img src="" alt="sa">
+        </a>
+        <div class="nav__close" id="nav-close">
+          <i class="fi fi-rs-cross-small"></i>
+        </div>
+      </div>
+      <ul class="nav__list">
+        <li class="nav__item">
+            <a href="{% url 'dashboard' %}" class="nav__link {% if request.path == '/' %}active-link{% endif %}">Admin Dashboard</a>
+        </li>
+        <li class="nav__item">
+            <a href="{% url 'product_list' %}" class="nav__link {% if request.path == '/shop/' %}active-link{% endif %}">Manage Products</a>
+        </li>
+
+        <li class="nav__item">
+            <a href="{% url 'admin_users' %}" class="nav__link {% if request.path == '/users/' %}active-link{% endif %}">Manage Users</a>
+        </li>
+
+
+        <li class="nav__item">
+            <a href="{% url 'add_product' %}" class="nav__link {% if request.path == '/adminpanel/product/add/' %}active-link{% endif %}">Add Product</a>
+        </li>
+        <li class="nav__item">
+          <a href="{% url 'manage_orders' %}" class="nav__link {% if request.path == '/shop/' %}active-link{% endif %}">Manage Orders</a>
+      </li>
+        <li class="nav__item">
+            <a href="{% url 'shop' %}" class="nav__link {% if request.path == '/shop/' %}active-link{% endif %}">User's View</a>
+        </li>
+        
+        <li class="nav__item">
+            <a href="{% url 'manage_category' %}" class="nav__link {% if request.path == '/login-register/' %}active-link{% endif %}">Manage Category</a>
+        </li>
+        
+    </ul>
+      {% include 'admin/admin-search.html'%}
+    </div>
+   
+  </nav>

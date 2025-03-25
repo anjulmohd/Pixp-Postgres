@@ -1,0 +1,160 @@
+{% extends 'admin/admin-base.html' %}
+
+{% block content %}
+<section class="breadcrumb">
+    <ul class="breadcrumb__list flex container">
+      
+      <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><span class="breadcrumb__link">Manage Offers</span></li>
+    </ul>
+  </section>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Offers</h2>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Product</th>
+                <th>Image</th>
+                <th>Category</th>
+                <th>Product on Sale</th>
+                <th>Toggle Product Sale</th>
+                <th>Sale Price</th>
+                <th>Toggle Sale Price</th>
+                <th>Category on Sale</th>
+                <th>Category Sale %</th>
+                <th>Initial Price</th>
+                <th>Price after Category Discount</th>
+                <th>Price after Product Discount</th>
+                <th>Final Price</th>
+                  <!-- New column for discount type -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in products_with_prices %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="80"></td>
+                <td>{{ item.product.category.name }}</td>
+                <td>
+                    <span class="badge {% if item.product.is_sale %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if item.product.is_sale %}On Sale{% else %}Not on Sale{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'toggle_product_sale' item.product.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm {% if item.product.is_sale %}btn-danger{% else %}btn-success{% endif %}">
+                            {% if item.product.is_sale %}Disable{% else %}Enable{% endif %}
+                        </button>
+                    </form>
+                </td>
+                <td>{{ item.product.sale_price }}</td>
+                <td>
+                    <form method="post" action="{% url 'toggle_sale_price' item.product.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="sale_price" value="{{ item.product.sale_price }}" step="0.01" class="form-control form-control-sm" required>
+                        <button type="submit" class="btn btn-sm btn-primary mt-1">Update</button>
+                    </form>
+                </td>
+                <td>
+                    <span class="badge {% if item.product.category.is_sale %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if item.product.category.is_sale %}On Sale{% else %}Not on Sale{% endif %}
+                    </span>
+                   
+                </td>
+                <td>{{ item.product.category.sale_percentage }}%</td>
+                <td>{{ item.product.price_initial }}</td>
+                <td>
+                    {% if item.product.category.is_sale %}
+                        {{ item.product.category_discounted_price }}
+                    {% else %}
+                        <span class="text-muted">Sale is not applied</span>
+                    {% endif %}
+                </td>
+                
+                <td>
+                    {% if item.product.is_sale %}
+                        {{ item.product.product_discounted_price }}
+                    {% else %}
+                        <span class="text-muted">Sale is not applied</span>
+                    {% endif %}
+                </td>
+                
+                <td>{{ item.final_price }} <br><span class="text-muted"> {{ item.discount_type }} </span> </td>  <!-- Updated to use item.final_price -->
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button class="btn"id="update-all-variant-prices">Update Variant Prices </button>
+</div>
+
+
+<style>
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table thead tr th:nth-child(1), .table tbody tr td:nth-child(1) {
+    width: 135px;
+}
+    .table thead tr th:nth-child(2), .table tbody tr td:nth-child(2) {
+    width: 78px;
+}
+
+.table thead tr th:nth-child(4), .table tbody tr td:nth-child(4) {
+    width: 108px;
+}
+.table thead tr th:nth-child(5), .table tbody tr td:nth-child(5) {
+    width: 96px;
+}
+.table thead tr th:nth-child(6), .table tbody tr td:nth-child(6) {
+    width: 91px;
+}
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 10px;
+    }
+    .table img {
+        border-radius: 8px;
+    }
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+    .badge {
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 12px;
+    }
+</style>
+<script>
+    document.getElementById('update-all-variant-prices').addEventListener('click', function () {
+        fetch("{% url 'update_all_variant_prices' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not OK");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(data.message);  // ✅ Show success message
+                location.reload();   // ✅ Reload to reflect changes
+            } else {
+                alert("Failed to update variant prices: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+{% endblock %}

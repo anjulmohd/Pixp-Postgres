@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+<link href="{% static 'css/wallet.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Wallet Balance Card -->
+  <div class="wallet-header">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <p class="balance-label mb-1">Total Balance</p>
+        <h1 class="balance-amount">₹{{ wallet.balance }}</h1>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <i class="fas fa-wallet fa-3x opacity-50"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Payment Form -->
+  <div class="mb-3">
+    <form id="razorpay-form" method="POST">
+      {% csrf_token %}
+      <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount to add" required>
+      <button type="button" id="rzp-button" class="btn btn-success mt-2">
+        <i class="fas fa-plus"></i> Add Money
+      </button>
+    </form>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="transaction-card">
+    <div class="transaction-header">
+      <h3 class="m-0 fw-bold">Transaction History</h3>
+      <div>
+        <i class="fas fa-arrow-down-wide-short ms-2 text-primary"></i>
+      </div>
+    </div>
+
+    {% if transactions %}
+    <div class="table-responsive">
+      <table class="table transaction-table">
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Order</th> <!-- Order Column -->
+          </tr>
+        </thead>
+        <tbody>
+          {% for transaction in transactions %}
+          <tr>
+            <td class="transaction-id">{{ transaction.transaction_unique_id }}</td>
+            <td>{{ transaction.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+              {% if transaction.transaction_type == "CREDIT" %}
+              <span class="transaction-type credit">
+                <i class="fas fa-arrow-down me-1"></i> Credit
+              </span>
+              {% elif transaction.transaction_type == "REFUND" %}
+              <span class="transaction-type refund">
+                <i class="fas fa-undo-alt me-1"></i> Refund
+              </span>
+              {% else %}
+              <span class="transaction-type debit">
+                <i class="fas fa-arrow-up me-1"></i> Debit
+              </span>
+              {% endif %}
+            </td>
+            <td class="fw-semibold 
+                {% if transaction.transaction_type == 'CREDIT' %}text-success
+                {% elif transaction.transaction_type == 'REFUND' %}text-warning
+                {% else %}text-danger{% endif %}">
+              {% if transaction.transaction_type == "CREDIT" %}+{% elif transaction.transaction_type == "REFUND" %}+{% else %}-{% endif %}₹{{ transaction.amount }}
+            </td>
+            <td>{{ transaction.description }}</td>
+
+            <!-- Display Order for Refund Transactions -->
+            <td>
+              {% if transaction.transaction_type == "REFUND" and transaction.order %}
+              <a href="{% url 'order_success' transaction.order.id %}" class="btn-sm btn-primary">
+                View
+              </a>
+              {% else %}
+              -
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-receipt"></i>
+      <h5>No transactions yet</h5>
+      <p class="text-muted">Your transaction history will appear here</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script >
+  document.getElementById("rzp-button").onclick = function (e) {
+    e.preventDefault();
+    let amountInput = document.getElementById("amount");
+    let amountEntered = parseFloat(amountInput.value); // Get the amount entered by the user
+
+    // Validate the amount
+    if (!amountEntered || amountEntered <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    // Divide the amount by 100
+    let amountInRupees = amountEntered / 100; // Convert to rupees
+    console.log("Amount entered:", amountEntered); // Debugging
+    console.log("Amount in rupees:", amountInRupees); // Debugging
+
+    // Convert the amount to paise
+    let amountInPaise = Math.round(amountInRupees * 100); // Convert rupees to paise
+    console.log("Amount in paise:", amountInPaise); // Debugging
+
+    fetch("{% url 'create_razorpay_order' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ amount: amountInPaise }) // Send amount in paise
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Razorpay order response:", data); // Debugging
+        let options = {
+            "key": "{{ razorpay_key }}",
+            "amount": amountInPaise, // Amount in paise (required for payment)
+            "currency": "INR",
+            "order_id": data.order_id,
+            "handler": function (response) {
+                console.log("Razorpay payment response:", response); // Debugging
+                fetch("{% url 'razorpay_success' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(res => res.json())
+                .then(result => {
+                    console.log("Payment verification response:", result); // Debugging
+                    if (result.status === "success") {
+                        alert("Payment successful! Wallet updated.");
+                        location.reload();
+                    } else {
+                        alert("Payment verification failed.");
+                    }
+                });
+            },
+            "prefill": {
+                "name": "{{ request.user.get_full_name }}", // Prefill user's name
+                "email": "{{ request.user.email }}" // Prefill user's email
+            },
+            "theme": {
+                "color": "#3399cc"
+            },
+            "description": `Wallet Top-up: ₹${amountInRupees.toFixed(2)}`, // Display amount in rupees
+            "notes": {
+                "amount_in_rupees": `₹${amountInRupees.toFixed(2)}` // Additional note
+            }
+        };
+        let rzp = new Razorpay(options);
+        rzp.open();
+    })
+    .catch(error => console.error("Error:", error));
+};
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,839 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<style>
+    .about-hero {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                  url("{% static 'images/about-hero.jpg' %}") no-repeat center center;
+      background-size: cover;
+      color: white;
+      padding: 120px 0;
+      margin-bottom: 60px;
+    }
+  
+    .team-member {
+      transition: transform 0.3s ease;
+      margin-bottom: 30px;
+    }
+  
+    .team-member:hover {
+      transform: translateY(-10px);
+    }
+  
+    .team-member img {
+      border-radius: 50%;
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border: 5px solid #f8f9fa;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+  
+    .timeline {
+      position: relative;
+      padding: 0;
+      list-style: none;
+    }
+  
+    .timeline:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      margin-left: -1px;
+      background-color: #e9ecef;
+    }
+  
+    .timeline-item {
+      position: relative;
+      margin-bottom: 50px;
+      min-height: 50px;
+    }
+  
+    .timeline-panel {
+      position: relative;
+      float: left;
+      width: 46%;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+  
+    .timeline-item:nth-child(even) .timeline-panel {
+      float: right;
+    }
+  
+    .timeline-image {
+      position: absolute;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      margin-left: -40px;
+      border: 7px solid #e9ecef;
+      border-radius: 100%;
+      text-align: center;
+      background-color: #007bff;
+      color: white;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .stats-item {
+      text-align: center;
+      padding: 30px 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      transition: transform 0.3s ease;
+    }
+  
+    .stats-item:hover {
+      transform: scale(1.05);
+      background: #e9ecef;
+    }
+  
+    .stats-number {
+      font-size: 48px;
+      font-weight: 700;
+      color: #007bff;
+    }
+  
+    .accordion-button:not(.collapsed) {
+      background-color: rgba(0, 123, 255, 0.1);
+      color: #007bff;
+    }
+  
+    .testimonial {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+  
+    .client-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  
+    .contact-info i {
+      width: 40px;
+      height: 40px;
+      background: #007bff;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+    }
+  
+    /* Animations */
+    .fade-in {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+  
+    .fade-in.active {
+      opacity: 1;
+    }
+  </style>
+<!-- Hero Section -->
+<section class="about-hero">
+  <div class="container text-center">
+    <h1 class="display-4 mb-4">About Us</h1>
+    <p class="lead mb-5">We're on a mission to transform how people experience technology</p>
+    <a href="#contact" class="btn btn-primary btn-lg">Get in Touch</a>
+  </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="container mb-5">
+  <div class="row align-items-center fade-in">
+    <div class="col-lg-6 mb-4">
+      <h2>Our Story</h2>
+      <p class="lead">From humble beginnings to industry leaders</p>
+      <p>Founded in 2010, our company began with a simple idea: to create technology that genuinely improves people's lives. Over the years, we've grown from a small startup to an established organization with a global presence.</p>
+      <p>Our journey hasn't always been easy, but our dedication to innovation and customer satisfaction has remained unwavering. Today, we're proud to serve thousands of clients worldwide, helping them achieve their goals through cutting-edge solutions.</p>
+      <a href="" class="btn btn-outline-primary">Read Full Story</a>
+    </div>
+    <div class="col-lg-6">
+      <img src="{% static 'images/our-story.jpg' %}" class="img-fluid rounded shadow" alt="Our company story">
+    </div>
+  </div>
+</section>
+
+<!-- Mission and Values Section -->
+<section class="bg-light py-5 mb-5">
+  <div class="container fade-in">
+    <div class="text-center mb-5">
+      <h2>Our Mission & Values</h2>
+      <p class="lead">What drives us every day</p>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="mb-4">
+              <i class="fas fa-bullseye fa-3x text-primary"></i>
+            </div>
+            <h3 class="h4">Mission</h3>
+            <p>To empower businesses and individuals with innovative technology solutions that drive growth and success.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="mb-4">
+              <i class="fas fa-eye fa-3x text-primary"></i>
+            </div>
+            <h3 class="h4">Vision</h3>
+            <p>To be recognized globally as the leading provider of transformative technology solutions.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="mb-4">
+              <i class="fas fa-heart fa-3x text-primary"></i>
+            </div>
+            <h3 class="h4">Values</h3>
+            <p>Integrity, Innovation, Excellence, Collaboration, and Customer-centricity guide everything we do.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section class="container mb-5">
+  <div class="text-center mb-5 fade-in">
+    <h2>Meet Our Team</h2>
+    <p class="lead">The talented people behind our success</p>
+  </div>
+  <div class="row justify-content-center fade-in">
+    {% for member in team_members %}
+    <div class="col-lg-3 col-md-6 text-center team-member">
+      <img src="{{ member.image.url }}" alt="{{ member.name }}">
+      <h3 class="h5">{{ member.name }}</h3>
+      <p class="text-muted">{{ member.position }}</p>
+      <div class="social-links">
+        {% if member.linkedin %}
+        <a href="{{ member.linkedin }}" class="mx-2"><i class="fab fa-linkedin"></i></a>
+        {% endif %}
+        {% if member.twitter %}
+        <a href="{{ member.twitter }}" class="mx-2"><i class="fab fa-twitter"></i></a>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-md-3 text-center team-member">
+      <img src="{% static 'images/team/ceo.jpg' %}" alt="John Doe">
+      <h3 class="h5">John Doe</h3>
+      <p class="text-muted">CEO & Founder</p>
+      <div class="social-links">
+        <a href="#" class="mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="mx-2"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    <div class="col-md-3 text-center team-member">
+      <img src="{% static 'images/team/cto.jpg' %}" alt="Jane Smith">
+      <h3 class="h5">Jane Smith</h3>
+      <p class="text-muted">CTO</p>
+      <div class="social-links">
+        <a href="#" class="mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="mx-2"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    <div class="col-md-3 text-center team-member">
+      <img src="{% static 'images/team/designer.jpg' %}" alt="Mike Johnson">
+      <h3 class="h5">Mike Johnson</h3>
+      <p class="text-muted">Lead Designer</p>
+      <div class="social-links">
+        <a href="#" class="mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="mx-2"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    <div class="col-md-3 text-center team-member">
+      <img src="{% static 'images/team/manager.jpg' %}" alt="Sarah Williams">
+      <h3 class="h5">Sarah Williams</h3>
+      <p class="text-muted">Project Manager</p>
+      <div class="social-links">
+        <a href="#" class="mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="mx-2"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if team_count > 4 %}
+  <div class="text-center mt-4">
+    <a href="" class="btn btn-outline-primary">View All Team Members</a>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Timeline Section -->
+<section class="bg-light py-5 mb-5">
+  <div class="container fade-in">
+    <div class="text-center mb-5">
+      <h2>Our Journey</h2>
+      <p class="lead">Key milestones that shaped who we are today</p>
+    </div>
+    <ul class="timeline">
+      {% for milestone in milestones %}
+      <li class="timeline-item">
+        <div class="timeline-image">
+          <h4>{{ milestone.year }}</h4>
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>{{ milestone.title }}</h4>
+          </div>
+          <div class="timeline-body">
+            <p>{{ milestone.description }}</p>
+          </div>
+        </div>
+      </li>
+      {% empty %}
+      <li class="timeline-item">
+        <div class="timeline-image">
+          <h4>2010</h4>
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>Our Founding</h4>
+          </div>
+          <div class="timeline-body">
+            <p>The company was founded with a vision to revolutionize the technology landscape.</p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-image">
+          <h4>2015</h4>
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>Major Expansion</h4>
+          </div>
+          <div class="timeline-body">
+            <p>We expanded our operations to three new countries and doubled our team size.</p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-image">
+          <h4>2020</h4>
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>Innovation Award</h4>
+          </div>
+          <div class="timeline-body">
+            <p>Recognized as the most innovative company in our industry with multiple patents.</p>
+          </div>
+        </div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-image">
+          <h4>Now</h4>
+        </div>
+        <div class="timeline-panel">
+          <div class="timeline-heading">
+            <h4>Global Impact</h4>
+          </div>
+          <div class="timeline-body">
+            <p>Today, our solutions are used by millions of people across the globe.</p>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="container mb-5">
+  <div class="text-center mb-5 fade-in">
+    <h2>Our Impact</h2>
+    <p class="lead">Numbers that tell our story</p>
+  </div>
+  <div class="row fade-in">
+    <div class="col-md-3 mb-4">
+      <div class="stats-item">
+        <div class="stats-number" data-count="500">0</div>
+        <p>Happy Clients</p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="stats-item">
+        <div class="stats-number" data-count="150">0</div>
+        <p>Team Members</p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="stats-item">
+        <div class="stats-number" data-count="1000">0</div>
+        <p>Projects Completed</p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="stats-item">
+        <div class="stats-number" data-count="25">0</div>
+        <p>Countries Served</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="bg-light py-5 mb-5">
+  <div class="container fade-in">
+    <div class="text-center mb-5">
+      <h2>Frequently Asked Questions</h2>
+      <p class="lead">Answers to common questions about our company</p>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="accordion" id="faqAccordion">
+          {% for faq in faqs %}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+              <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                {{ faq.question }}
+              </button>
+            </h2>
+            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                {{ faq.answer }}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                What sets your company apart from competitors?
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Our unique approach combines cutting-edge technology with a deep understanding of our clients' needs. We don't just provide solutions; we build lasting partnerships that drive mutual success.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                How do you ensure quality in your products?
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                Quality is at the core of everything we do. We follow rigorous testing protocols and maintain ISO certifications. Our development process includes multiple review stages to ensure our products exceed industry standards.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                What industries do you serve?
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+              <div class="accordion-body">
+                We work across multiple sectors including finance, healthcare, education, retail, and manufacturing. Our diverse expertise allows us to bring cross-industry insights to every project we undertake.
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="container mb-5">
+  <div class="text-center mb-5 fade-in">
+    <h2>What Our Clients Say</h2>
+    <p class="lead">Testimonials from those who trust us</p>
+  </div>
+  <div class="row fade-in">
+    {% for testimonial in testimonials %}
+    <div class="col-lg-4 mb-4">
+      <div class="testimonial">
+        <div class="d-flex align-items-center mb-3">
+          <img src="{{ testimonial.client_image.url }}" alt="{{ testimonial.client_name }}" class="client-img me-3">
+          <div>
+            <h5 class="mb-0">{{ testimonial.client_name }}</h5>
+            <p class="text-muted mb-0">{{ testimonial.client_position }}</p>
+          </div>
+        </div>
+        <p>{{ testimonial.content }}</p>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-lg-4 mb-4">
+      <div class="testimonial">
+        <div class="d-flex align-items-center mb-3">
+          <img src="{% static 'images/clients/client1.jpg' %}" alt="Client 1" class="client-img me-3">
+          <div>
+            <h5 class="mb-0">Robert Brown</h5>
+            <p class="text-muted mb-0">CEO, Tech Innovations</p>
+          </div>
+        </div>
+        <p>"Working with this team has been transformative for our business. Their attention to detail and commitment to excellence is unmatched in the industry."</p>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="testimonial">
+        <div class="d-flex align-items-center mb-3">
+          <img src="{% static 'images/clients/client2.jpg' %}" alt="Client 2" class="client-img me-3">
+          <div>
+            <h5 class="mb-0">Emily Chen</h5>
+            <p class="text-muted mb-0">CTO, Global Solutions</p>
+          </div>
+        </div>
+        <p>"Their innovative approach to problem-solving has helped us overcome challenges that seemed insurmountable. I highly recommend their services."</p>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="testimonial">
+        <div class="d-flex align-items-center mb-3">
+          <img src="{% static 'images/clients/client3.jpg' %}" alt="Client 3" class="client-img me-3">
+          <div>
+            <h5 class="mb-0">David Wilson</h5>
+            <p class="text-muted mb-0">Director, Future Enterprises</p>
+          </div>
+        </div>
+        <p>"The level of customer service and technical expertise provided is exceptional. They truly understand our business needs and deliver solutions that drive growth."</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if testimonial_count > 3 %}
+  <div class="text-center mt-4">
+    <a href="" class="btn btn-outline-primary">View All Testimonials</a>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Partners Section -->
+<section class="bg-light py-5 mb-5">
+  <div class="container fade-in">
+    <div class="text-center mb-5">
+      <h2>Our Partners</h2>
+      <p class="lead">Trusted organizations we collaborate with</p>
+    </div>
+    <div class="row align-items-center">
+      {% for partner in partners %}
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="img-fluid" style="max-height: 60px;">
+      </div>
+      {% empty %}
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner1.png' %}" alt="Partner 1" class="img-fluid" style="max-height: 60px;">
+      </div>
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner2.png' %}" alt="Partner 2" class="img-fluid" style="max-height: 60px;">
+      </div>
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner3.png' %}" alt="Partner 3" class="img-fluid" style="max-height: 60px;">
+      </div>
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner4.png' %}" alt="Partner 4" class="img-fluid" style="max-height: 60px;">
+      </div>
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner5.png' %}" alt="Partner 5" class="img-fluid" style="max-height: 60px;">
+      </div>
+      <div class="col-md-2 col-6 text-center mb-4">
+        <img src="{% static 'images/partners/partner6.png' %}" alt="Partner 6" class="img-fluid" style="max-height: 60px;">
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="container mb-5" id="contact">
+  <div class="text-center mb-5 fade-in">
+    <h2>Get in Touch</h2>
+    <p class="lead">We'd love to hear from you</p>
+  </div>
+  <div class="row fade-in">
+    <div class="col-lg-6 mb-4">
+      <div class="contact-info mb-4">
+        <div class="d-flex align-items-center mb-3">
+          <i class="fas fa-map-marker-alt"></i>
+          <div>
+            <h5 class="mb-0">Our Location</h5>
+            <p class="mb-0">123 Innovation Street, Tech City, TC 12345</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-info mb-4">
+        <div class="d-flex align-items-center mb-3">
+          <i class="fas fa-envelope"></i>
+          <div>
+            <h5 class="mb-0">Email Us</h5>
+            <p class="mb-0">info@yourcompany.com</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-info mb-4">
+        <div class="d-flex align-items-center mb-3">
+          <i class="fas fa-phone"></i>
+          <div>
+            <h5 class="mb-0">Call Us</h5>
+            <p class="mb-0">+1 (123) 456-7890</p>
+          </div>
+        </div>
+      </div>
+      <div class="mb-4">
+        <h5>Follow Us</h5>
+        <div class="social-links">
+          <a href="#" class="me-3"><i class="fab fa-facebook-f fa-2x"></i></a>
+          <a href="#" class="me-3"><i class="fab fa-twitter fa-2x"></i></a>
+          <a href="#" class="me-3"><i class="fab fa-linkedin-in fa-2x"></i></a>
+          <a href="#" class="me-3"><i class="fab fa-instagram fa-2x"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h4 class="mb-4">Send us a message</h4>
+          <form action="" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Your Email</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+              <label for="subject" class="form-label">Subject</label>
+              <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message</label>
+              <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Map Section -->
+<section class="mb-5 fade-in">
+  <div class="container-fluid px-0">
+    <div class="ratio ratio-21x9">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12345.67890!2d-73.9876543!3d40.7654321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM40zNDUnMTkuNCJOIDczwrA1OSczNS42Ilc!5e0!3m2!1sen!2sus!4v1234567890" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="bg-primary text-white py-5 mb-5">
+  <div class="container fade-in">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h3>Subscribe to Our Newsletter</h3>
+        <p>Stay updated with our latest news, insights, and offers.</p>
+      </div>
+      <div class="col-lg-6">
+        <form action="" method="post" class="d-flex">
+          {% csrf_token %}
+          <input type="email" name="email" class="form-control me-2" placeholder="Your email address" required>
+          <button type="submit" class="btn btn-light">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+  const fadeElements = document.querySelectorAll('.fade-in');
+  
+  const fadeInObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  fadeElements.forEach(element => {
+    fadeInObserver.observe(element);
+  });
+  
+  // Animate stats numbers
+  const statsNumbers = document.querySelectorAll('.stats-number');
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = entry.target;
+        const finalNumber = parseInt(target.getAttribute('data-count'));
+        let currentNumber = 0;
+        const duration = 2000; // Animation duration in milliseconds
+        const stepTime = 50; // Time between steps in milliseconds
+        const totalSteps = duration / stepTime;
+        const stepValue = finalNumber / totalSteps;
+        
+        const counter = setInterval(() => {
+          currentNumber += stepValue;
+          if (currentNumber >= finalNumber) {
+            clearInterval(counter);
+            target.textContent = finalNumber;
+          } else {
+            target.textContent = Math.floor(currentNumber);
+          }
+        }, stepTime);
+      }
+    });
+  }, { threshold: 0.5, triggerOnce: true });
+  
+  statsNumbers.forEach(number => {
+    statsObserver.observe(number);
+  });
+  
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const targetId = this.getAttribute('href');
+      if (targetId !== '#') {
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80, // Offset for fixed header
+            behavior: 'smooth'
+          });
+        }
+      }
+    });
+  });
+  
+  // Form validation
+  const contactForm = document.querySelector('form[action*="contact"]');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      let isValid = true;
+      const requiredInputs = this.querySelectorAll('[required]');
+      
+      requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+          isValid = false;
+          input.classList.add('is-invalid');
+        } else {
+          input.classList.remove('is-invalid');
+        }
+        
+        // Email validation
+        if (input.type === 'email' && input.value.trim()) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(input.value.trim())) {
+            isValid = false;
+            input.classList.add('is-invalid');
+          }
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        
+        // Show alert message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.textContent = 'Please fill all required fields correctly.';
+        
+        // Remove any existing alerts
+        const existingAlerts = this.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        this.appendChild(alertDiv);
+      }
+    });
+    
+    // Remove validation classes on input
+    contactForm.querySelectorAll('input, textarea').forEach(input => {
+      input.addEventListener('input', function() {
+        if (this.value.trim()) {
+          this.classList.remove('is-invalid');
+        }
+      });
+    });
+  }
+  
+  // Newsletter form validation
+  const newsletterForm = document.querySelector('form[action*="newsletter"]');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function(e) {
+      const emailInput = this.querySelector('input[type="email"]');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+        e.preventDefault();
+        emailInput.classList.add('is-invalid');
+        
+        // Create tooltip or message
+        if (!this.querySelector('.invalid-feedback')) {
+          const feedback = document.createElement('div');
+          feedback.className = 'invalid-feedback';
+          feedback.textContent = 'Please enter a valid email address';
+          emailInput.parentNode.appendChild(feedback);
+        }
+      }
+    });
+  }
+  
+  // Team member hover effect enhancement
+  const teamMembers = document.querySelectorAll('.team-member');
+  teamMembers.forEach(member => {
+    member.addEventListener('mouseenter', function() {
+      this.style.zIndex = '10';
+    });
+    
+    member.addEventListener('mouseleave', function() {
+      this.style.zIndex = '1';
+    });
+  });
+  
+  // Lazy load images
+  if ('loading' in HTMLImageElement.prototype) {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+      img.src = img.dataset.src;
+    });
+  } else {
+    // Fallback for browsers that don't support lazy loading
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js';
+    document.body.appendChild(script);
+  }
+});
+
+</script>
+{% endblock %}

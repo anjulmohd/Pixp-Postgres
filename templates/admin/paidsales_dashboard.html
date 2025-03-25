@@ -1,0 +1,322 @@
+{% extends 'admin/admin-base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+<link href="{% static 'css/paid_dashboard.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<section class="breadcrumb">
+  <ul class="breadcrumb__list flex container">
+      <li><a href="{% url 'dashboard' %}" class="breadcrumb__link">Admin Panel</a></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><span class="breadcrumb__link">Manage Prepaid orders</span></li>
+      <li><span class="breadcrumb__link">></span></li>
+      <li><span class="breadcrumb__link">View Sales Dashboard</span></li>
+  </ul>
+</section>
+
+<div class="sales-dashboard">
+  <!-- Header Section -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>Sales Performance Dashboard</h1>
+      <div class="date-filter">
+        <form method="get" class="date-form">
+          <div class="date-inputs">
+            <div class="input-group">
+              <label for="start_date">From</label>
+              <input type="date" id="start_date" name="start_date" value="{{ request.GET.start_date|default:'' }}">
+            </div>
+            <div class="input-group">
+              <label for="end_date">To</label>
+              <input type="date" id="end_date" name="end_date" value="{{ request.GET.end_date|default:'' }}">
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="submit" class="filter-btn">Apply Filter</button>
+            <a href="{% url 'sales_report_pdf' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}" class="download-btn" target="_blank">
+              <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- Summary Cards -->
+  <section class="summary-cards">
+    <div class="card">
+      <div class="card-icon revenue">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="card-content">
+        <h3>Total Revenue</h3>
+        <p class="card-value">₹{{ total_revenue|floatformat:2 }}</p>
+        <p class="card-trend {% if revenue_change >= 0 %}positive{% else %}negative{% endif %}">
+          <i class="fas fa-{% if revenue_change >= 0 %}arrow-up{% else %}arrow-down{% endif %}"></i>
+          {{ revenue_change|floatformat:1 }}% from previous period
+        </p>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon orders">
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+      <div class="card-content">
+        <h3>Total Orders</h3>
+        <p class="card-value">{{ total_orders }}</p>
+        <p class="card-trend {% if order_change >= 0 %}positive{% else %}negative{% endif %}">
+          <i class="fas fa-{% if order_change >= 0 %}arrow-up{% else %}arrow-down{% endif %}"></i>
+          {{ order_change|floatformat:1 }}% from previous period
+        </p>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon avg-order">
+        <i class="fas fa-receipt"></i>
+      </div>
+      <div class="card-content">
+        <h3>Average Order Value</h3>
+        <p class="card-value">₹{{ avg_order_value|floatformat:2 }}</p>
+        <p class="card-trend {% if aov_change >= 0 %}positive{% else %}negative{% endif %}">
+          <i class="fas fa-{% if aov_change >= 0 %}arrow-up{% else %}arrow-down{% endif %}"></i>
+          {{ aov_change|floatformat:1 }}% from previous period
+        </p>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-icon delivery">
+        <i class="fas fa-truck"></i>
+      </div>
+      <div class="card-content">
+        <h3>Delivered Orders</h3>
+        <p class="card-value">{{ delivered_orders }}</p>
+        <p class="card-ratio">{{ delivered_ratio|floatformat:1 }}% of total orders</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section class="charts-container">
+    <div class="chart-card">
+      <h3>Revenue Trend</h3>
+      <canvas id="revenueChart"></canvas>
+    </div>
+    
+    <div class="chart-card">
+      <h3>Sales by Status</h3>
+      <canvas id="statusChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Recent Orders Table -->
+  <section class="recent-orders">
+    <div class="section-header">
+      <h2>Recent Orders</h2>
+      <a href="{% url 'manage_paidorders'%}" class="view-all">View All Orders</a>
+    </div>
+    
+    <div class="table-container">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Discounted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr>
+            <td>{{ order.order_unique_id }}</td>
+            <td>{{ order.user.username }}</td>
+            <td>{{ order.created_at|date:"M d, Y" }}</td>
+            <td>
+              <span class="status-badge status-{{ order.status|lower }}">
+                {{ order.get_status_display }}
+              </span>
+            </td>
+            <td>{{ order.order_items.count }}</td>
+            <td>₹{{ order.total_price|floatformat:2 }}</td>
+            <td>₹{{ order.discounted_price|floatformat:2 }}</td>
+            <td>
+              <div class="action-buttons">
+                <a href="{% url 'paidorder_detail_admin' order.id %}" class="btn-view" title="View Details">View Details
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="no-data">No orders found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Top Products Section -->
+  <section class="top-products">
+    <h2>Top Selling Products</h2>
+    <div class="products-grid">
+        {% for product in top_products %}
+        <div class="product-card">
+            <div class="product-image">
+                <!-- Display product variant image if it exists, otherwise fall back to product image -->
+                {% if product.product_variant and product.product_variant.image %}
+                    <img src="{{ product.product_variant.image.url }}" alt="{{ product.product_variant.name }}">
+                {% elif product.product and product.product.image %}
+                    <img src="{{ product.product.image.url }}" alt="{{ product.product.name }}">
+                {% else %}
+                    <div class="no-image">No image</div>
+                {% endif %}
+            </div>
+            <div class="product-details">
+                <h4>
+                    <!-- Display product name with variant -->
+                    {% if product.product_variant %}
+                        {{ product.product_variant.product.name }} - {{ product.product_variant.name }}
+                    {% elif product.product %}
+                        {{ product.product.name }}
+                    {% else %}
+                        Product Not Found
+                    {% endif %}
+                </h4>
+                <p class="product-price">
+                    <!-- Display price based on product or variant -->
+                    ₹{% if product.product_variant %}
+                        {{ product.product_variant.price|floatformat:2 }}
+                    {% elif product.product %}
+                        {{ product.product.price|floatformat:2 }}
+                    {% else %}
+                        0.00
+                    {% endif %}
+                </p>
+                <div class="product-stats">
+                    <div class="stat">
+                        <span class="stat-label">Units Sold</span>
+                        <span class="stat-value">{{ product.total_quantity }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Revenue</span>
+                        <span class="stat-value">₹{{ product.total_revenue|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-data-message">No product data available</div>
+        {% endfor %}
+    </div>
+</section>
+</div>
+
+<!-- JavaScript for Charts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ensure the element exists before accessing its context
+        const revenueCanvas = document.getElementById('revenueChart');
+        if (revenueCanvas) {
+          const revenueCtx = revenueCanvas.getContext('2d');
+    
+          const revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+              labels: JSON.parse('{{ dates_json|safe }}'),  // Ensure JSON data is properly formatted
+              datasets: [{
+                label: 'Revenue',
+                data: JSON.parse('{{ revenue_data_json|safe }}'),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.4
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      return '$ ' + context.raw.toFixed(2);
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    callback: function (value) {
+                      return '$ ' + value;
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+      
+        // Order Status Chart
+        const statusCanvas = document.getElementById('statusChart');
+        if (statusCanvas) {
+          const statusCtx = statusCanvas.getContext('2d');
+          const statusChart = new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+              labels: JSON.parse('{{ status_labels_json|safe }}'),
+              datasets: [{
+                data: JSON.parse('{{ status_data_json|safe }}'),
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.8)',  // PENDING
+                  'rgba(54, 162, 235, 0.8)',  // PAID
+                  'rgba(255, 206, 86, 0.8)',  // FAILED
+                  'rgba(75, 192, 192, 0.8)',  // PROCESSED
+                  'rgba(153, 102, 255, 0.8)', // SHIPPED
+                  'rgba(255, 159, 64, 0.8)',  // DELIVERED
+                  'rgba(199, 199, 199, 0.8)', // RETURN REQUESTED
+                  'rgba(100, 149, 237, 0.8)', // RETURN APPROVED
+                  'rgba(255, 140, 0, 0.8)',   // CANCEL REQUESTED
+                  'rgba(85, 107, 47, 0.8)'    // CANCEL APPROVED
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'right',
+                }
+              }
+            }
+          });
+        }
+      
+        // Function to handle invoice printing
+        function printInvoice(orderId) {
+          alert('Printing invoice for order: ' + orderId);
+          // Alternatively, window.open('/orders/print-invoice/' + orderId, '_blank');
+        }
+      
+        // Expose function globally if needed
+        window.printInvoice = printInvoice;
+      });
+</script>
+{% endblock %}
