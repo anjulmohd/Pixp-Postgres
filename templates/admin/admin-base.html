@@ -51,249 +51,290 @@
         transition: margin-left var(--transition-speed) ease-in-out;
       }
 
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: var(--sidebar-width);
-        height: 100vh;
-        background: var(--sidebar-bg);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding-top: 0;
-        transition: width var(--transition-speed) ease-in-out;
-        z-index: 1000;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-
-      .sidebar.collapsed {
-        width: var(--sidebar-collapsed-width);
-      }
-
-      .sidebar.collapsed .sidebar-header h3,
-      .sidebar.collapsed .nav-link span {
-        display: none;
-      }
-
-      .sidebar.collapsed .nav-link {
-        justify-content: center;
-        padding: 12px 0;
-      }
-
-      .sidebar.collapsed .nav-link i {
-        margin-right: 0;
-        font-size: 1.3rem;
-      }
-
-      .sidebar.collapsed .menu-divider {
-        margin: 10px 5px;
-      }
-
-      .sidebar-header {
-        padding: 25px 20px;
-        background-color: rgba(0, 0, 0, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-
-      .sidebar-header h3 {
-        margin: 0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--text-light);
-        letter-spacing: 0.5px;
-        transition: opacity var(--transition-speed);
-      }
-
-      .sidebar-menu {
-        padding: 15px 0;
-      }
-
-      .sidebar a {
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        color: rgba(255, 255, 255, 0.8);
-        text-decoration: none;
-        font-size: 0.95rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        border-left: 4px solid transparent;
-        margin: 4px 0;
-        white-space: nowrap;
-      }
-
-      .sidebar a i {
-        margin-right: 10px;
-        font-size: 1.1rem;
-        min-width: 25px;
-        text-align: center;
-        transition: margin var(--transition-speed);
-      }
-
-      .sidebar a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: var(--text-light);
-        border-left-color: var(--accent-color);
-      }
-
-      .sidebar a.active {
-        background-color: rgba(255, 255, 255, 0.15);
-        color: var(--text-light);
-        border-left-color: var(--accent-color);
-        font-weight: 600;
-      }
-
-      .menu-divider {
-        height: 1px;
-        background-color: rgba(255, 255, 255, 0.1);
-        margin: 10px 15px;
-        transition: margin var(--transition-speed);
-      }
-
-      /* Sidebar Toggle Button */
-      .sidebar-toggle {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 10px 12px;
-        cursor: pointer;
-        z-index: 1001;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: all 0.2s ease;
-        display: none; /* Hidden by default */
-    }
-
-    /* Show toggle button only on mobile */
-    @media (max-width: 768px) {
-        .sidebar-toggle {
-            display: block; /* Show on mobile */
-        }
-    }
-
-      .sidebar-toggle:hover {
-        background-color: var(--secondary-color);
-      }
-
-      /* Main Content */
-      .content {
-        margin-left: var(--sidebar-width);
-        padding: 20px;
-        transition: margin-left var(--transition-speed) ease-in-out;
-        min-height: 100vh;
-      }
-
-      .sidebar.collapsed + .content {
-        margin-left: var(--sidebar-collapsed-width);
-      }
-
-      /* Overlay for mobile */
-      .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-        display: none;
-      }
-
-      /* Responsive */
-      @media (max-width: 992px) {
+      /* Desktop Sidebar */
+      @media (min-width: 992px) {
         .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: var(--sidebar-width);
+          height: 100vh;
+          background: var(--sidebar-bg);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          padding-top: 0;
+          transition: width var(--transition-speed) ease-in-out;
+          z-index: 1000;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+        .sidebar.collapsed {
           width: var(--sidebar-collapsed-width);
         }
-        
-        .sidebar .sidebar-header h3,
-        .sidebar .nav-link span {
+
+        .sidebar.collapsed .sidebar-header h3,
+        .sidebar.collapsed .nav-link span {
           display: none;
         }
 
-        .sidebar .nav-link {
+        .sidebar.collapsed .nav-link {
           justify-content: center;
           padding: 12px 0;
         }
 
-        .sidebar .nav-link i {
+        .sidebar.collapsed .nav-link i {
           margin-right: 0;
           font-size: 1.3rem;
         }
 
-        .sidebar .menu-divider {
+        .sidebar.collapsed .menu-divider {
           margin: 10px 5px;
         }
 
-        .content {
-          margin-left: var(--sidebar-collapsed-width);
+        .sidebar-header {
+          padding: 25px 20px;
+          background-color: rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
         }
 
-        .sidebar-toggle {
-          display: block;
+        .sidebar-header h3 {
+          margin: 0;
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--text-light);
+          letter-spacing: 0.5px;
+          transition: opacity var(--transition-speed);
+        }
+
+        .sidebar-menu {
+          padding: 15px 0;
+        }
+
+        .sidebar a {
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          color: rgba(255, 255, 255, 0.8);
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          border-left: 4px solid transparent;
+          margin: 4px 0;
+          white-space: nowrap;
+        }
+
+        .sidebar a i {
+          margin-right: 10px;
+          font-size: 1.1rem;
+          min-width: 25px;
+          text-align: center;
+          transition: margin var(--transition-speed);
+        }
+
+        .sidebar a:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: var(--text-light);
+          border-left-color: var(--accent-color);
+        }
+
+        .sidebar a.active {
+          background-color: rgba(255, 255, 255, 0.15);
+          color: var(--text-light);
+          border-left-color: var(--accent-color);
+          font-weight: 600;
+        }
+
+        .menu-divider {
+          height: 1px;
+          background-color: rgba(255, 255, 255, 0.1);
+          margin: 10px 15px;
+          transition: margin var(--transition-speed);
+        }
+
+        /* Main Content */
+        .content {
+          margin-left: var(--sidebar-width);
+          padding: 20px;
+          transition: margin-left var(--transition-speed) ease-in-out;
+          min-height: 100vh;
+        }
+
+        .sidebar.collapsed + .content {
+          margin-left: var(--sidebar-collapsed-width);
         }
       }
 
-      @media (max-width: 768px) {
+      /* Mobile Navigation Bar */
+      @media (max-width: 991.98px) {
         .sidebar {
-          left: -100%;
-          width: var(--sidebar-width);
+          display: none; /* Hide the sidebar on mobile */
         }
         
-        .sidebar .sidebar-header h3,
-        .sidebar .nav-link span {
-          display: block;
+        .mobile-navbar {
+          display: flex;
+          flex-direction: column;
+          background: var(--sidebar-bg);
+          width: 100%;
+          z-index: 1000;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
-        .sidebar .nav-link {
-          justify-content: flex-start;
+        
+        .mobile-navbar .navbar-brand {
+          color: var(--text-light);
+          font-weight: 700;
+          padding: 15px 20px;
+          text-align: center;
+          background-color: rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-navbar .nav-link {
+          color: rgba(255, 255, 255, 0.8);
           padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          border-left: 4px solid transparent;
         }
-
-        .sidebar .nav-link i {
+        
+        .mobile-navbar .nav-link i {
           margin-right: 10px;
           font-size: 1.1rem;
+          min-width: 25px;
+          text-align: center;
         }
-
-        .sidebar .menu-divider {
-          margin: 10px 15px;
+        
+        .mobile-navbar .nav-link:hover,
+        .mobile-navbar .nav-link.active {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: var(--text-light);
+          border-left-color: var(--accent-color);
         }
-
-        .sidebar.open {
-          left: 0;
+        
+        .mobile-navbar .nav-link.active {
+          font-weight: 600;
         }
-
+        
+        .mobile-navbar .menu-divider {
+          height: 1px;
+          background-color: rgba(255, 255, 255, 0.1);
+          margin: 0;
+        }
+        
         .content {
           margin-left: 0;
+          padding: 20px;
+          min-height: 100vh;
         }
-
-        .sidebar.open + .content {
-          margin-left: 0;
+        
+        /* Dropdown menu for mobile */
+        .mobile-dropdown {
+          display: none;
+          background-color: rgba(0, 0, 0, 0.1);
         }
-
-        .sidebar.open ~ .sidebar-overlay {
+        
+        .mobile-dropdown.show {
           display: block;
+        }
+        
+        .dropdown-toggle::after {
+          display: inline-block;
+          margin-left: auto;
+          transition: transform 0.3s;
+        }
+        
+        .dropdown-toggle.show::after {
+          transform: rotate(180deg);
         }
       }
     </style>
   </head>
 
   <body>
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-navbar d-lg-none">
+      <div class="navbar-brand">Admin Panel</div>
+      
+      <a href="{% url 'dashboard' %}" class="nav-link">
+        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+      </a>
+      
+      <div class="menu-divider"></div>
+      
+      <div class="nav-item">
+        <a href="#" class="nav-link dropdown-toggle" onclick="toggleMobileDropdown(this, 'ordersDropdown')">
+          <i class="bi bi-cart"></i> <span>Orders</span>
+        </a>
+        <div class="mobile-dropdown" id="ordersDropdown">
+          <a href="{% url 'manage_orders' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-credit-card"></i> <span>Postpaid Orders</span>
+          </a>
+          <a href="{% url 'manage_paidorders' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-wallet2"></i> <span>Prepaid Orders</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="menu-divider"></div>
+      
+      <div class="nav-item">
+        <a href="#" class="nav-link dropdown-toggle" onclick="toggleMobileDropdown(this, 'productsDropdown')">
+          <i class="bi bi-box"></i> <span>Products</span>
+        </a>
+        <div class="mobile-dropdown" id="productsDropdown">
+          <a href="{% url 'product_list' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-box-seam"></i> <span>Manage Products</span>
+          </a>
+          <a href="{% url 'add_product' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-plus-circle"></i> <span>Add Product</span>
+          </a>
+          <a href="{% url 'manage_all_stock' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-archive"></i> <span>Manage Stock</span>
+          </a>
+          <a href="{% url 'manage_category' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-diagram-3"></i> <span>Manage Category</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="menu-divider"></div>
+      
+      <div class="nav-item">
+        <a href="#" class="nav-link dropdown-toggle" onclick="toggleMobileDropdown(this, 'managementDropdown')">
+          <i class="bi bi-gear"></i> <span>Management</span>
+        </a>
+        <div class="mobile-dropdown" id="managementDropdown">
+          <a href="{% url 'admin_users' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-people"></i> <span>Manage Users</span>
+          </a>
+          <a href="{% url 'manage_offers' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-tags"></i> <span>Manage Offers</span>
+          </a>
+          <a href="{% url 'manage_wallets' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-cash-stack"></i> <span>Manage Wallets</span>
+          </a>
+          <a href="{% url 'coupon_list' %}" class="nav-link" style="padding-left: 40px;">
+            <i class="bi bi-ticket-perforated"></i> <span>Manage Coupons</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="menu-divider"></div>
+      
+      <a href="{% url 'shop' %}" class="nav-link">
+        <i class="bi bi-shop"></i> <span>Users View</span>
+      </a>
+    </div>
 
-    <!-- Sidebar Toggle Button -->
-    <button class="sidebar-toggle" onclick="toggleSidebar()">
-      <i class="bi bi-list"></i>
-    </button>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <!-- Desktop Sidebar -->
+    <div class="sidebar d-none d-lg-block" id="sidebar">
       <div class="sidebar-header">
         <h3>Admin Panel</h3>
       </div>
@@ -353,73 +394,93 @@
 
     <!-- JavaScript -->
     <script>
-      function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        const content = document.getElementById("content");
-        const overlay = document.getElementById("sidebarOverlay");
+      // Function to toggle mobile dropdown menus
+      function toggleMobileDropdown(link, dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        dropdown.classList.toggle('show');
+        link.classList.toggle('show');
         
-        // For mobile view
-        if (window.innerWidth <= 768) {
-          sidebar.classList.toggle("open");
-          overlay.style.display = sidebar.classList.contains("open") ? "block" : "none";
-        } 
-        // For tablet view
-        else if (window.innerWidth <= 992) {
-          sidebar.classList.toggle("collapsed");
-          if (sidebar.classList.contains("collapsed")) {
-            content.style.marginLeft = "70px";
-          } else {
-            content.style.marginLeft = "250px";
+        // Close other dropdowns when opening a new one
+        const allDropdowns = document.querySelectorAll('.mobile-dropdown');
+        const allLinks = document.querySelectorAll('.dropdown-toggle');
+        
+        allDropdowns.forEach(d => {
+          if (d.id !== dropdownId && d.classList.contains('show')) {
+            d.classList.remove('show');
           }
+        });
+        
+        allLinks.forEach(l => {
+          if (l !== link && l.classList.contains('show')) {
+            l.classList.remove('show');
+          }
+        });
+      }
+
+      // Function to handle active sidebar item
+      function setActiveSidebarItem(clickedLink) {
+        const sidebarLinks = document.querySelectorAll(".sidebar a, .mobile-navbar a");
+        
+        // Remove active class from all sidebar links
+        sidebarLinks.forEach(link => link.classList.remove("active"));
+        
+        // Add active class to the clicked link
+        clickedLink.classList.add("active");
+        
+        // Store the active link in localStorage
+        localStorage.setItem("activeSidebar", clickedLink.getAttribute("href"));
+        
+        // Close mobile dropdowns after selection
+        if (window.innerWidth <= 991) {
+          const dropdowns = document.querySelectorAll('.mobile-dropdown');
+          dropdowns.forEach(d => d.classList.remove('show'));
+          
+          const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+          dropdownToggles.forEach(t => t.classList.remove('show'));
         }
       }
 
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function(event) {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
+      // Restore active sidebar item on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        const sidebarLinks = document.querySelectorAll(".sidebar a, .mobile-navbar a");
+        const savedActiveLink = localStorage.getItem("activeSidebar");
         
-        if (window.innerWidth <= 768 && 
-            !sidebar.contains(event.target) && 
-            !event.target.classList.contains('sidebar-toggle')) {
-          sidebar.classList.remove('open');
-          overlay.style.display = 'none';
+        if (savedActiveLink) {
+          sidebarLinks.forEach(link => {
+            if (link.getAttribute("href") === savedActiveLink) {
+              link.classList.add("active");
+            }
+          });
+        }
+        
+        // Attach click event listeners to sidebar links
+        sidebarLinks.forEach(link => {
+          link.addEventListener("click", function () {
+            if (!this.classList.contains('dropdown-toggle')) {
+              setActiveSidebarItem(this);
+            }
+          });
+        });
+        
+        // Initialize sidebar based on screen size
+        const sidebar = document.getElementById("sidebar");
+        const content = document.getElementById("content");
+        
+        if (window.innerWidth >= 992) {
+          content.style.marginLeft = "250px";
+        } else {
+          content.style.marginLeft = "0";
         }
       });
-
+      
       // Handle window resize
       window.addEventListener('resize', function() {
         const sidebar = document.getElementById("sidebar");
         const content = document.getElementById("content");
-        const overlay = document.getElementById("sidebarOverlay");
         
-        if (window.innerWidth > 768) {
-          sidebar.classList.remove('open');
-          overlay.style.display = 'none';
-          
-          if (window.innerWidth <= 992) {
-            sidebar.classList.add('collapsed');
-            content.style.marginLeft = "70px";
-          } else {
-            sidebar.classList.remove('collapsed');
-            content.style.marginLeft = "250px";
-          }
-        }
-      });
-
-      // Initialize sidebar based on screen size
-      document.addEventListener("DOMContentLoaded", function() {
-        const sidebar = document.getElementById("sidebar");
-        const content = document.getElementById("content");
-        
-        if (window.innerWidth <= 992) {
-          sidebar.classList.add('collapsed');
-          content.style.marginLeft = "70px";
-        }
-        
-        if (window.innerWidth <= 768) {
-          sidebar.classList.remove('collapsed');
-          sidebar.classList.remove('open');
+        if (window.innerWidth >= 992) {
+          content.style.marginLeft = "250px";
+        } else {
           content.style.marginLeft = "0";
         }
       });
@@ -434,42 +495,11 @@
         }
       }
     </script>
-    <script>
-      // Function to handle active sidebar item
-      function setActiveSidebarItem(clickedLink) {
-        const sidebarLinks = document.querySelectorAll(".sidebar a");
-
-        // Remove active class from all sidebar links
-        sidebarLinks.forEach(link => link.classList.remove("active"));
-
-        // Add active class to the clicked link
-        clickedLink.classList.add("active");
-
-        // Store the active link in localStorage
-        localStorage.setItem("activeSidebar", clickedLink.getAttribute("href"));
+    <style>
+      .navbar-brand{
+        margin-right: 0rem;
       }
-
-      // Restore active sidebar item on page load
-      document.addEventListener("DOMContentLoaded", () => {
-        const sidebarLinks = document.querySelectorAll(".sidebar a");
-        const savedActiveLink = localStorage.getItem("activeSidebar");
-
-        if (savedActiveLink) {
-          sidebarLinks.forEach(link => {
-            if (link.getAttribute("href") === savedActiveLink) {
-              link.classList.add("active");
-            }
-          });
-        }
-
-        // Attach click event listeners to sidebar links
-        sidebarLinks.forEach(link => {
-          link.addEventListener("click", function () {
-            setActiveSidebarItem(this);
-          });
-        });
-      });
-    </script>
+    </style>
 
     <script src="{% static 'js/main.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

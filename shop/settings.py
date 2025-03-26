@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-#58wb-_lmspfz_55u&k5l2t6ccv=9+1z+75rg42lcq!i2tc#fj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['pixp.up.railway.app','https://pixp.up.railway.app']
+ALLOWED_HOSTS = ['pixp.up.railway.app','https://pixp.up.railway.app','127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://pixp.up.railway.app']
 
 
@@ -177,11 +177,23 @@ WSGI_APPLICATION = 'shop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# DATABASE_URL = os.getenv("DATABASE_URL")
+
+# DATABASES = {
+#     'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+# }
 
 DATABASES = {
-    'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'pixp_aws',              # Your RDS database name
+        'USER': 'postgres',            # Your RDS username
+        'PASSWORD': os.getenv("DATABASE_AWS_PASSWORD"),    # Your RDS password
+        'HOST': 'database-1.czi8cwissmyc.eu-north-1.rds.amazonaws.com',     # e.g., mydb.xxxxxx.ap-south-1.rds.amazonaws.com
+        'PORT':'5432',
+        }
 }
+
 AUTH_USER_MODEL = 'login.CustomUser'
 
 

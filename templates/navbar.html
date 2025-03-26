@@ -2,7 +2,7 @@
 <nav class="navbar container-fluid">
   <!-- Logo Section -->
   <a href="{% url 'home'%}" class="navbar__logo">
-    <img class="navbar__logo-img" src="{% static 'images/logo1.png'%}" alt="website logo" />
+    <img class="navbar__logo-img" src="{% static 'images/logoup.png'%}" alt="website logo" />
   </a>
   
   <!-- Mobile Menu Toggle -->
@@ -18,7 +18,7 @@
   <div class="navbar__menu" id="navbar-menu">
     <div class="navbar__menu-header">
       <a href="{% url 'home'%}" class="navbar__menu-logo">
-        <img src="{% static 'images/logo1.png'%}" alt="website logo" />
+        <img src="{% static 'images/logoup.png'%}" alt="website logo" />
       </a>
       <div class="navbar__close" id="navbar-close">
         <i class="fas fa-times"></i>
@@ -135,10 +135,12 @@
           <i class="fas fa-box navbar__dropdown-icon"></i>
           <span>Orders</span>
         </a>
+        {% if user.is_active %}
         <a href="{% url 'logout' %}" class="navbar__dropdown-link">
           <i class="fas fa-sign-out-alt navbar__dropdown-icon"></i>
           <span>Logout</span>
         </a>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -166,7 +168,7 @@
 }
 
 .navbar__logo-img {
-  height: 40px;
+  height: 80px;
   transition: transform 0.3s ease;
 }
 
@@ -462,7 +464,10 @@
     transition: left 0.3s ease;
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
   }
-  
+  .navbar__logo-img {
+  height: 40px;
+ 
+}
   .navbar__menu.active {
     left: 0;
   }
