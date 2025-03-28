@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from myapp.models import Product,Category, ProductImage,ProductVariant
 from .forms import ProductForm, OrderStatusUpdateForm,CategoryForm,PaidOrderStatusUpdateForm,CouponForm,ProductVariantForm
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Q,Sum,F,Count,DecimalField
+from django.db.models import Q,Sum,F,Count,DecimalField,Case,When
 from django.db.models.functions import Lower
 from django.core.paginator import Paginator
 from django.views.generic import CreateView,UpdateView
@@ -1037,22 +1037,43 @@ def sales_report_pdf(request):
     else:
         start_date = end_date - timedelta(days=30)
     
+    # For comparison with previous period
+    previous_period_length = (end_date - start_date).days
+    previous_start_date = start_date - timedelta(days=previous_period_length)
+    previous_end_date = start_date - timedelta(days=1)
+    
     # Base query for current period
-    orders = Order.objects.filter(
+    current_orders = Order.objects.filter(
         created_at__date__gte=start_date,
         created_at__date__lte=end_date,
         is_active=True
     )
     
+    # Base query for previous period
+    previous_orders = Order.objects.filter(
+        created_at__date__gte=previous_start_date,
+        created_at__date__lte=previous_end_date,
+        is_active=True
+    )
+    
     # Calculate summary metrics
-    total_revenue = orders.aggregate(revenue=Sum('total_price'))['revenue'] or 0
-    total_orders = orders.count()
+    total_revenue = current_orders.aggregate(revenue=Sum('total_price'))['revenue'] or 0
+    previous_revenue = previous_orders.aggregate(revenue=Sum('total_price'))['revenue'] or 0
+    revenue_change = ((total_revenue - previous_revenue) / previous_revenue * 100) if previous_revenue > 0 else 100
+    
+    total_orders = current_orders.count()
+    previous_orders_count = previous_orders.count()
+    order_change = ((total_orders - previous_orders_count) / previous_orders_count * 100) if previous_orders_count > 0 else 100
+    
     avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
-    delivered_orders = orders.filter(status='DELIVERED').count()
+    previous_avg_order_value = previous_revenue / previous_orders_count if previous_orders_count > 0 else 0
+    aov_change = ((avg_order_value - previous_avg_order_value) / previous_avg_order_value * 100) if previous_avg_order_value > 0 else 0
+    
+    delivered_orders = current_orders.filter(status='DELIVERED').count()
     delivered_ratio = (delivered_orders / total_orders * 100) if total_orders > 0 else 0
     
     # Get order status distribution
-    status_distribution = orders.values('status').annotate(
+    status_distribution = current_orders.values('status').annotate(
         count=Count('id')
     ).order_by('status')
     
@@ -1062,34 +1083,45 @@ def sales_report_pdf(request):
         item['status_display'] = status_choices_dict.get(item['status'])
         item['percentage'] = (item['count'] / total_orders * 100) if total_orders > 0 else 0
     
-    # Get top products and variants
+    # Get top selling products with variants
     top_items = OrderItem.objects.filter(
-        order__in=orders
+        order__in=current_orders
     ).values(
-        'product', 'variant'
+        'product', 'product_variant'
     ).annotate(
         total_quantity=Sum('quantity'),
-        total_revenue=Sum(F('quantity') * F('price'))
+        total_revenue=Sum(
+            F('quantity') * Coalesce(F('product_variant__price'), F('product__price'))
+        )
     ).order_by('-total_quantity')[:10]
     
-    # Add product and variant details to top items
+    # Add product and variant details with error handling
     top_products_with_variants = []
     for item in top_items:
-        product = Product.objects.get(pk=item['product'])
-        variant = None
-        if item['variant']:
-            variant = ProductVariant.objects.get(pk=item['variant'])
-        
-        top_products_with_variants.append({
-            'product': product,
-            'variant': variant,
-            'total_quantity': item['total_quantity'],
-            'total_revenue': item['total_revenue']
-        })
+        try:
+            product = Product.objects.get(pk=item['product'])
+            variant = None
+            if item['product_variant']:
+                try:
+                    variant = ProductVariant.objects.get(pk=item['product_variant'])
+                except ProductVariant.DoesNotExist:
+                    variant = None
+                    # Fallback to product price if variant is missing
+                    item['total_revenue'] = item['total_quantity'] * product.price
+            
+            top_products_with_variants.append({
+                'product': product,
+                'variant': variant,
+                'total_quantity': item['total_quantity'],
+                'total_revenue': item['total_revenue']
+            })
+        except Product.DoesNotExist:
+            continue  # Skip products that no longer exist
     
     # Daily revenue breakdown
-    daily_revenue = orders.values('created_at__date').annotate(
-        date=F('created_at__date'),
+    daily_revenue = current_orders.annotate(
+        date=TruncDate('created_at')
+    ).values('date').annotate(
         revenue=Sum('total_price')
     ).order_by('date')
     
@@ -1098,26 +1130,185 @@ def sales_report_pdf(request):
         'start_date': start_date,
         'end_date': end_date,
         'report_generated': datetime.now(),
+        
+        # Current period metrics
         'total_revenue': total_revenue,
         'total_orders': total_orders,
         'avg_order_value': avg_order_value,
         'delivered_orders': delivered_orders,
         'delivered_ratio': delivered_ratio,
+        
+        # Comparison metrics
+        'revenue_change': abs(revenue_change),
+        'order_change': abs(order_change),
+        'aov_change': abs(aov_change),
+        
+        # Data tables
         'status_distribution': status_distribution,
-        'top_products_with_variants': top_products_with_variants,  # Changed this line
-        'daily_revenue': daily_revenue
+        'top_products_with_variants': top_products_with_variants,
+        'daily_revenue': daily_revenue,
     }
     
     # Generate PDF
     pdf = render_to_pdf('admin/sales_report_pdf.html', context)
     
+    if not pdf:
+        return HttpResponse("Failed to generate PDF", status=500)
+    
     # Set filename for download
     filename = f"Sales_Report_{start_date.strftime('%Y%m%d')}_to_{end_date.strftime('%Y%m%d')}.pdf"
-    pdf['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
-    return pdf
+    return response
 
-
+def paidsales_report_pdf(request):
+    # Get date range from request parameters or default to last 30 days
+    end_date = request.GET.get('end_date')
+    start_date = request.GET.get('start_date')
+    
+    # Parse dates if provided, otherwise use defaults
+    today = datetime.now().date()
+    if end_date:
+        try:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except ValueError:
+            end_date = today
+    else:
+        end_date = today
+    
+    if start_date:
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        except ValueError:
+            start_date = end_date - timedelta(days=30)
+    else:
+        start_date = end_date - timedelta(days=30)
+    
+    # For comparison with previous period
+    previous_period_length = (end_date - start_date).days
+    previous_start_date = start_date - timedelta(days=previous_period_length)
+    previous_end_date = start_date - timedelta(days=1)
+    
+    # Base query for current period
+    current_orders = PaymentOrder.objects.filter(
+        created_at__date__gte=start_date,
+        created_at__date__lte=end_date,
+        is_active=True
+    )
+    
+    # Base query for previous period
+    previous_orders = PaymentOrder.objects.filter(
+        created_at__date__gte=previous_start_date,
+        created_at__date__lte=previous_end_date,
+        is_active=True
+    )
+    
+    # Calculate summary metrics
+    total_revenue = current_orders.aggregate(revenue=Sum('total_price'))['revenue'] or 0
+    previous_revenue = previous_orders.aggregate(revenue=Sum('total_price'))['revenue'] or 0
+    revenue_change = ((total_revenue - previous_revenue) / previous_revenue * 100) if previous_revenue > 0 else 100
+    
+    total_orders = current_orders.count()
+    previous_orders_count = previous_orders.count()
+    order_change = ((total_orders - previous_orders_count) / previous_orders_count * 100) if previous_orders_count > 0 else 100
+    
+    avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
+    previous_avg_order_value = previous_revenue / previous_orders_count if previous_orders_count > 0 else 0
+    aov_change = ((avg_order_value - previous_avg_order_value) / previous_avg_order_value * 100) if previous_avg_order_value > 0 else 0
+    
+    delivered_orders = current_orders.filter(status='DELIVERED').count()
+    delivered_ratio = (delivered_orders / total_orders * 100) if total_orders > 0 else 0
+    
+    # Get order status distribution (using PaymentOrder.STATUS_CHOICES)
+    status_distribution = current_orders.values('status').annotate(
+        count=Count('id')
+    ).order_by('status')
+    
+    # Convert status codes to display names
+    status_choices_dict = dict(PaymentOrder.STATUS_CHOICES)
+    for item in status_distribution:
+        item['status_display'] = status_choices_dict.get(item['status'])
+        item['percentage'] = (item['count'] / total_orders * 100) if total_orders > 0 else 0
+    
+    # Get top selling products with variants
+    top_items = PaymentOrderItem.objects.filter(
+        order__in=current_orders
+    ).values(
+        'product', 'product_variant'
+    ).annotate(
+        total_quantity=Sum('quantity'),
+        total_revenue=Sum(
+            F('quantity') * Coalesce(F('product_variant__price'), F('product__price'))
+        )
+    ).order_by('-total_quantity')[:10]
+    
+    # Add product and variant details with error handling
+    top_products_with_variants = []
+    for item in top_items:
+        try:
+            product = Product.objects.get(pk=item['product'])
+            variant = None
+            if item['product_variant']:
+                try:
+                    variant = ProductVariant.objects.get(pk=item['product_variant'])
+                except ProductVariant.DoesNotExist:
+                    variant = None
+                    # Fallback to product price if variant is missing
+                    item['total_revenue'] = item['total_quantity'] * product.price
+            
+            top_products_with_variants.append({
+                'product': product,
+                'variant': variant,
+                'total_quantity': item['total_quantity'],
+                'total_revenue': item['total_revenue']
+            })
+        except Product.DoesNotExist:
+            continue  # Skip products that no longer exist
+    
+    # Daily revenue breakdown
+    daily_revenue = current_orders.annotate(
+        date=TruncDate('created_at')
+    ).values('date').annotate(
+        revenue=Sum('total_price')
+    ).order_by('date')
+    
+    # Prepare context
+    context = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'report_generated': datetime.now(),
+        
+        # Current period metrics
+        'total_revenue': total_revenue,
+        'total_orders': total_orders,
+        'avg_order_value': avg_order_value,
+        'delivered_orders': delivered_orders,
+        'delivered_ratio': delivered_ratio,
+        
+        # Comparison metrics
+        'revenue_change': abs(revenue_change),
+        'order_change': abs(order_change),
+        'aov_change': abs(aov_change),
+        
+        # Data tables
+        'status_distribution': status_distribution,
+        'top_products_with_variants': top_products_with_variants,
+        'daily_revenue': daily_revenue,
+    }
+    
+    # Generate PDF
+    pdf = render_to_pdf('admin/paidsales_report_pdf.html', context)
+    
+    if not pdf:
+        return HttpResponse("Failed to generate PDF", status=500)
+    
+    # Set filename for download
+    filename = f"Paid_Sales_Report_{start_date.strftime('%Y%m%d')}_to_{end_date.strftime('%Y%m%d')}.pdf"
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
 def paidsales_dashboard(request):
     # Get date range from request parameters or default to last 30 days

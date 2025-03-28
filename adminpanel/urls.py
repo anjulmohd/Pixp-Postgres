@@ -47,6 +47,7 @@ urlpatterns = [
 
     path('sales-dashboard/', views.sales_dashboard, name='sales_dashboard'),
     path('sales-report-pdf/', views.sales_report_pdf, name='sales_report_pdf'),
+    path('paidsales-report-pdf/', views.paidsales_report_pdf, name='paidsales_report_pdf'),
 
     path('paidsales-dashboard/', views.paidsales_dashboard, name='paidsales_dashboard'),
 
