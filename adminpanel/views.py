@@ -1062,20 +1062,30 @@ def sales_report_pdf(request):
         item['status_display'] = status_choices_dict.get(item['status'])
         item['percentage'] = (item['count'] / total_orders * 100) if total_orders > 0 else 0
     
-    # Get top products
-    top_products = OrderItem.objects.filter(
+    # Get top products and variants
+    top_items = OrderItem.objects.filter(
         order__in=orders
     ).values(
-        'product'
+        'product', 'variant'
     ).annotate(
         total_quantity=Sum('quantity'),
-        total_revenue=Sum(F('quantity') * F('product__price'))
+        total_revenue=Sum(F('quantity') * F('price'))
     ).order_by('-total_quantity')[:10]
     
-    # Add product details to top products
-    for item in top_products:
-        from myapp.models import Product  # Import here to avoid circular imports
-        item['product'] = Product.objects.get(pk=item['product'])
+    # Add product and variant details to top items
+    top_products_with_variants = []
+    for item in top_items:
+        product = Product.objects.get(pk=item['product'])
+        variant = None
+        if item['variant']:
+            variant = ProductVariant.objects.get(pk=item['variant'])
+        
+        top_products_with_variants.append({
+            'product': product,
+            'variant': variant,
+            'total_quantity': item['total_quantity'],
+            'total_revenue': item['total_revenue']
+        })
     
     # Daily revenue breakdown
     daily_revenue = orders.values('created_at__date').annotate(
@@ -1094,7 +1104,7 @@ def sales_report_pdf(request):
         'delivered_orders': delivered_orders,
         'delivered_ratio': delivered_ratio,
         'status_distribution': status_distribution,
-        'top_products': top_products,
+        'top_products_with_variants': top_products_with_variants,  # Changed this line
         'daily_revenue': daily_revenue
     }
     
@@ -1106,7 +1116,6 @@ def sales_report_pdf(request):
     pdf['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return pdf
-
 
 
 
