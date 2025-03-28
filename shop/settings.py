@@ -28,8 +28,22 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.21.192.2','pixp.up.railway.app','https://pixp.up.railway.app','127.0.0.1','16.16.15.121']
-CSRF_TRUSTED_ORIGINS = ['https://pixp.up.railway.app']
+ALLOWED_HOSTS = [
+    '51.21.192.2',              # Old server IP (if still used)
+    'pixp.up.railway.app',      # Railway app domain
+    'https://pixp.up.railway.app',  # Not needed here (remove this)
+    '127.0.0.1',                # Localhost
+    '16.16.15.121',             # Elastic IP
+    'pixp.shop',                # Main domain
+    'www.pixp.shop',            # With www prefix
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://pixp.up.railway.app',  # Railway URL
+    'https://pixp.shop',            # Main domain
+    'https://www.pixp.shop',        # With www prefix
+]
+
 
 
 # Application definition
