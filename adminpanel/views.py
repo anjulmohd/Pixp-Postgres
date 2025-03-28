@@ -150,14 +150,19 @@ def manage_category(request):
     form = CategoryForm()
 
     if request.method == "POST":
-        form = CategoryForm(request.POST)
+        form = CategoryForm(request.POST, request.FILES)  # Added request.FILES
 
-        
         if form.is_valid():
             form.save()
             return redirect("manage_category")  # Redirect to refresh the page
+        else:
+            # Form is invalid - errors will be displayed in template
+            pass
 
-    return render(request, "admin/manage-category.html", {"categories": categories, "form": form})
+    return render(request, "admin/manage-category.html", {
+        "categories": categories, 
+        "form": form
+    })
 
 def toggle_sale(request, category_id):
     """Toggle the sale status of a category."""
