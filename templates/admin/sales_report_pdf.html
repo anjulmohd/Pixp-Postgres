@@ -103,6 +103,11 @@
             font-size: 9pt;
             color: #95a5a6;
         }
+        .variant-info {
+            font-size: 9pt;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
@@ -156,14 +161,29 @@
             <thead>
                 <tr>
                     <th>Top Products</th>
+                    <th>Variant</th>
                     <th>Quantity</th>
                     <th>Revenue</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in top_products %}
+                {% for item in top_products_with_variants %}
                 <tr>
-                    <td>{{ item.product.name }}</td>
+                    <td>
+                        {{ item.product.name }}
+                        {% if item.variant %}
+                            <div class="variant-info">
+                                SKU: {{ item.variant.sku }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.variant %}
+                            {{ item.variant.name }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td>{{ item.total_quantity }}</td>
                     <td>${{ item.total_revenue|floatformat:2 }}</td>
                 </tr>
