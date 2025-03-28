@@ -1,3 +1,4 @@
+{% load static %}
 <footer class="footer container">
   <div class="footer__container grid">
     <div class="footer__content">
@@ -74,38 +75,43 @@
       </div>
       <div class="modal-body">
         <p>Welcome to Pixel Palace, your premier destination for cutting-edge digital experiences. At Pixel Palace, we pride ourselves on blending innovation, creativity, and precision to create seamless, user-centric digital products that redefine the boundaries of technology.</p>
-    
+
         <h6>Our Mission</h6>
         <p>Our mission is to design and develop transformative digital solutions that empower businesses and individuals to thrive in the digital age. We are committed to delivering exceptional quality and pushing the limits of what’s possible to ensure that every client experiences unparalleled success.</p>
-    
+
         <h6>Meet Our Visionary Founder</h6>
+
+        <!-- Founder Image Section -->
+        <div class="text-center mb-4">
+          <img src="{% static 'images/founder.jpg'%}" alt="Anjul Mohammed - Founder" class="img-fluid rounded-circle" style="width: 300px; height: 300px;">
+        </div>
+
         <p>Pixel Palace was founded by none other than <strong>Anjul Mohammed</strong>, a visionary tech entrepreneur from Malappuram, Kerala. Anjul is not just a Django developer; he is an architect of the digital future. His journey began with an insatiable curiosity for coding and a relentless passion for building extraordinary web applications. Over the years, he has honed his skills in full-stack development and mastered the art of turning complex ideas into flawless digital experiences.</p>
-    
+
         <p>Anjul’s expertise in Django and Python has positioned him as a leading innovator in the industry. He possesses an uncanny ability to see beyond conventional boundaries and deliver solutions that exceed expectations. His work reflects a deep commitment to precision, security, and scalability — making Pixel Palace a trusted name in the digital world.</p>
-    
+
         <p>But beyond his technical brilliance, Anjul is known for his exceptional leadership and unwavering dedication to excellence. He believes that every project is an opportunity to redefine possibilities, and his meticulous approach ensures that each product crafted at Pixel Palace stands as a testament to quality and ingenuity.</p>
-    
+
         <p>Anjul’s expertise has not only gained him recognition as a top-tier developer but also established him as a mentor and inspiration for aspiring developers. His guidance has empowered many to embark on their own journeys of technological excellence. His dream is to make Pixel Palace a global powerhouse of digital transformation, and he tirelessly works toward that vision every single day.</p>
-    
+
         <h6>Our Values</h6>
         <p>At Pixel Palace, we uphold the following core values:</p>
         <ul>
-            <li><strong>Innovation:</strong> We continuously push the boundaries to explore new possibilities and deliver revolutionary digital solutions.</li>
-            <li><strong>Excellence:</strong> Our commitment to superior quality drives us to achieve perfection in every project.</li>
-            <li><strong>Client Satisfaction:</strong> We prioritize our clients' goals and go above and beyond to ensure their success.</li>
-            <li><strong>Integrity:</strong> We believe in building trust through honesty, transparency, and ethical practices.</li>
+          <li><strong>Innovation:</strong> We continuously push the boundaries to explore new possibilities and deliver revolutionary digital solutions.</li>
+          <li><strong>Excellence:</strong> Our commitment to superior quality drives us to achieve perfection in every project.</li>
+          <li><strong>Client Satisfaction:</strong> We prioritize our clients' goals and go above and beyond to ensure their success.</li>
+          <li><strong>Integrity:</strong> We believe in building trust through honesty, transparency, and ethical practices.</li>
         </ul>
-    
+
         <h6>Why Choose Pixel Palace?</h6>
         <p>Under the dynamic leadership of Anjul Mohammed, Pixel Palace has carved a niche for itself as a hub of innovation and digital excellence. We don’t just build websites — we craft transformative digital experiences that propel businesses to new heights. Our team is driven by a shared passion for excellence, and we are dedicated to helping our clients achieve their digital aspirations.</p>
-    
+
         <p>When you choose Pixel Palace, you’re choosing a legacy of innovation, a commitment to quality, and a partner who will stand by you through every step of your digital journey. Join us and experience the magic of cutting-edge technology, guided by the brilliance of Anjul Mohammed and the expertise of the Pixel Palace team.</p>
-    </div>
-    
-    
+      </div>
     </div>
   </div>
 </div>
+
 
 <!-- Delivery Information Modal -->
 <div class="modal fade" id="deliveryModal" tabindex="-1" aria-labelledby="deliveryModalLabel" aria-hidden="true">
