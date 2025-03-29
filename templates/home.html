@@ -283,21 +283,13 @@
               />
             </a>
             <div class="product__actions">
-              <a href="#" class="action__btn" aria-label="Quick View">
-                <i class="fi fi-rs-eye"></i>
-              </a>
-              <a href="#" class="action__btn" aria-label="Add to Wishlist">
-                <i class="fi fi-rs-heart"></i>
-              </a>
-              <a href="#" class="action__btn" aria-label="Compare">
-                <i class="fi fi-rs-shuffle"></i>
-              </a>
+              
             </div>
             <div class="product__badge blue">Latest Deal</div>
           </div>
           <div class="product__content">
             <span class="product__category">{{product.category.name}}</span>
-            <a href="details.html">
+            <a href="{% url 'product' product.id %}">
               <h3 class="product__title">{{product.name}}</h3>
             </a>
             <div class="product__rating">
