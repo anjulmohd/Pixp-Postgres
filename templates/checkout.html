@@ -187,121 +187,126 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-document.getElementById("placeOrderBtn").addEventListener("click", function (event) {
-    event.preventDefault();  // Prevent default form submission
-
-    let selectedPayment = document.querySelector('input[name="payment_method"]:checked').value;
-    let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-
-    if (selectedPayment === "cod") {
-        // Handle Cash on Delivery
-        window.location.href = "{% url 'place_order' %}";  
-    } 
-    else if (selectedPayment === "razorpay") {
-        // Step 1: Create Order via Backend API
-        fetch("{% url 'place_paymentorder' %}", { 
-            method: "POST", 
-            headers: { 
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken  
-            },
-            credentials: "include"
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error: " + data.error);
-                return;
-            }
-
-            // Step 2: Open Razorpay Payment Modal
-            var options = {
-                key: data.razorpay_key,  // Razorpay Key from Backend
-                amount: data.amount,  // Amount in paise
-                currency: data.currency,
-                order_id: data.razorpay_order_id,
-                name: "Demo Store",
-                description: "Order Payment",
-                prefill: {
-                    name: "{{ user.first_name }} {{ user.last_name }}",
-                    email: "{{ user.email }}"
+    document.getElementById("placeOrderBtn").addEventListener("click", function (event) {
+        event.preventDefault();  // Prevent default form submission
+    
+        let selectedPayment = document.querySelector('input[name="payment_method"]:checked').value;
+        let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    
+        if (selectedPayment === "cod") {
+            // Handle Cash on Delivery
+            window.location.href = "{% url 'place_order' %}";
+        } 
+        else if (selectedPayment === "razorpay") {
+            // Step 1: Create Order via Backend API
+            fetch("{% url 'place_paymentorder' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
                 },
-                theme: { color: "#F37254" },
-                callback_url: "{% url 'verify_payment' %}",  // Callback URL
-                handler: function (response) {
-                    // Step 3: Verify Payment via Backend
-                    fetch("{% url 'verify_payment' %}", {
-                        method: "POST",
-                        headers: { 
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": csrfToken  
-                        },
-                        body: JSON.stringify({
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === "Payment Successful") {
-                            alert("Payment Successful!");
-                            window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);  
-                        } else {
-                            alert("Payment Failed! Please try again.");
-                            window.location.href = "{% url 'order_failed' %}";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Verification Error:", error);
-                        alert("Payment verification failed!");
-                    });
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
                 }
-            };
-
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Something went wrong!");
-        });
-    } 
-    else if (selectedPayment === "paypal") {
-        alert("PayPal integration coming soon!");
-    }
-    else if (selectedPayment === "wallet") {
-        // Handle Wallet Balance Payment
-        fetch("{% url 'place_order_wallet' %}", { 
-            method: "POST", 
-            headers: { 
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken  
-            },
-            credentials: "include"
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error: " + data.error);
-                return;
-            }
-
-            if (data.status === "success") {
-                alert("Order placed successfully using wallet balance!");
-                window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);  
-            } else {
-                alert("Failed to place order using wallet balance.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Something went wrong!");
-        });
-    }
-});
-</script>
-
+    
+                // Step 2: Open Razorpay Payment Modal
+                var options = {
+                    key: data.razorpay_key,  // Razorpay Key from Backend
+                    amount: data.amount,  // Amount in paise
+                    currency: data.currency,
+                    order_id: data.razorpay_order_id,
+                    name: "Pixp Shop",
+                    description: "Order Payment",
+                    prefill: {
+                        name: "{{ user.first_name }} {{ user.last_name }}",
+                        email: "{{ user.email }}"
+                    },
+                    theme: { color: "#F37254" },
+                    handler: function (response) {
+                        // Step 3: Verify Payment via Backend
+                        fetch("{% url 'verify_payment' %}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": csrfToken
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "Payment Successful") {
+                                alert("Payment Successful!");
+                                window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);
+                            } else {
+                                alert("Payment Failed! Please try again.");
+                                window.location.href = "{% url 'order_failed' %}";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Verification Error:", error);
+                            alert("Payment verification failed! Please try again.");
+                        });
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            alert("Payment popup closed by user. Please try again.");
+                        }
+                    }
+                };
+    
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong while initiating the payment. Please try again.");
+            });
+        } 
+        else if (selectedPayment === "paypal") {
+            alert("PayPal integration coming soon!");
+        }
+        else if (selectedPayment === "wallet") {
+            // Handle Wallet Balance Payment
+            fetch("{% url 'place_order_wallet' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
+    
+                if (data.status === "success") {
+                    alert("Order placed successfully using wallet balance!");
+                    window.location.href = "{% url 'order_success' 0 %}".replace("0", data.order_id);
+                } else {
+                    alert("Failed to place order using wallet balance.");
+                    window.location.href = "{% url 'order_failed' %}";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        }
+    });
+    </script>
+    
 
 
 
